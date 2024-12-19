@@ -17,4 +17,6 @@ Upon completion of this course, students will be able to:
 In addition, graduate students will be able to:
 
 6) Select and cite relevant research articles to place their findings in context
-7) synthesize their findings into a broader environmental context
+7) Synthesize their findings into a broader environmental context
+
+![Course Icon](General/Course Icon.jpg)
