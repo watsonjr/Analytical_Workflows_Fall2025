@@ -1,4 +1,4 @@
-# GEOG 463/563 | Analytical Workflows for Earth Systems Science
+# Analytical Workflows for Earth Systems Science
 
 Welcome to the course webpage for GEOG 463/563 at Oregon State University! This repository will contain all code templates, data files, and other resources for the course and is linked to our [GitHub Classroom](https://classroom.github.com/classrooms/192258322-analytical-workflows-for-earth-science-2025).
 
@@ -14,4 +14,5 @@ Upon completion of this course, students will be able to:
 5) Manage complex research projects using a version control system
 
 In addition, graduate students will be able to:
-6) Select, cite, and synthesize relevant research articles to place their findings in context
+6) Select and cite relevant research articles to place their findings in context
+7) synthesize their findings into a broader environmental context
