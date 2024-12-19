@@ -16,7 +16,14 @@ Upon completion of this course, students will be able to:
 
 In addition, graduate students will be able to:
 
-6) Select and cite relevant research articles to place their findings in context
+6) Select and cite relevant research articles
 7) Synthesize their findings into a broader environmental context
+
+## Course Modules
+The course is organized around four modules that will help undergraduate and graduate students to achieve these learning outcomes:
+- [Module 1](https://github.com/Analytical-Workflows-for-Earth-Science/Sp2025/tree/main/Module%201) | Running quantitative and collaborative projects in the earth sciences
+- [Module 2](https://github.com/Analytical-Workflows-for-Earth-Science/Sp2025/tree/main/Module%202) | Working with big environmental data
+- [Module 3](https://github.com/Analytical-Workflows-for-Earth-Science/Sp2025/tree/main/Module%203) | Analyzing, visualizing, and modeling environmental data
+- [Module 4](https://github.com/Analytical-Workflows-for-Earth-Science/Sp2025/tree/main/Module%204) | Completing and evaluating projects
 
 ![Course Icon](General/CourseIcon.jpg)
