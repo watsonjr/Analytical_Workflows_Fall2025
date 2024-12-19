@@ -1,0 +1,96 @@
+---
+title: 'Lab 4: Analyzing Marine Heatwaves'
+author: "your name here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Background & Objectives
+In today's lab, you will be analyzing temperature data from the Great Barrier Reef (GBR) in Australia. These data are from the Agincourt Reef Automated Marine Weather and Oceanographic Station, which is located in the northern GBR. Corals living in the GBR have experienced several mass bleaching events in 2016, 2017, 2020, 2022, and 2024 (Henley et al. 2024). Bleaching occurs when corals expel their symbiotic dinoflagellates, which normally live in their tissues and provide photosynthetic energy to the corals. Without the algae, corals exhibit white calcium carbonate skeletons, hence the "bleaching" term. While bleaching has been linked to low salinity, cold waters, or nutrient pollution, it is generally associated with extremely warm water temperatures. We are aiming to detect marine heatwaves in these temperature time series to answer three research questions:
+
+1) Did the Agincourt Reef experience a marine heatwave during the five recent mass bleaching events?
+
+2) How did water depth affect the occurrence and severity of marine heatwaves?
+
+3) How do operational definitions of marine heatwaves affect their detection?
+
+# Data Exploration
+
+Load libraries
+```{r, echo=FALSE}
+library(heatwaveR)
+library(tidyverse)
+library(lubridate)
+```
+
+Load data from sensors at depths of 2.5 m, 10 m, and 12 m.
+```{r}
+Agincourt2.5 <- read.csv("Agincourt Reef Weather Station Water Temperature @2.5m from 1991-02-22 to 2024-05-02.csv")
+
+Agincourt10 <- read.csv("Agincourt Reef Weather Station Water Temperature @10m from 1991-02-22 to 2024-05-02.csv")
+
+Agincourt12 <- read.csv("Agincourt Reef Weather Station Water Temperature @12m from 1991-02-22 to 2024-05-02.csv")
+```
+
+What is the frequency of temperature observations?
+```{r}
+#TYPE ANSWER HERE
+```
+
+The heatwaveR package utilizes dates, but there isn't a date column yet. Make one for each data frame.
+```{r}
+Agincourt2.5$date <- date(Agincourt2.5$time)
+Agincourt10$date <- date(Agincourt10$time)
+Agincourt12$date <- date(Agincourt12$time)
+```
+
+How many quality control (QC) flags are there? What is the breakdown for each data frame? Use the function `table` to check the `qc_flag` column.
+```{r}
+table(Agincourt2.5$qc_flag)
+table(Agincourt10$qc_flag)
+table(Agincourt12$qc_flag)
+```
+
+Let's keep only the "Good" and "Probably Good" temperatures.
+```{r}
+Agincourt2.5_qc <- filter(Agincourt2.5, qc_flag %in% c("Good","Probably Good"))
+Agincourt10_qc <- filter(Agincourt10, qc_flag %in% c("Good","Probably Good"))
+Agincourt12_qc <- filter(Agincourt12, qc_flag %in% c("Good","Probably Good"))
+```
+
+Now that we have our quality temperature data saved, determine the starting and ending dates available for each time series.
+```{r}
+min(Agincourt2.5_qc$date)
+max(Agincourt2.5_qc$date)
+min(Agincourt10_qc$date)
+max(Agincourt10_qc$date)
+min(Agincourt12_qc$date)
+max(Agincourt12_qc$date)
+```
+
+Let's look at the time series in separate plots by depth. We will standardize the y-axis to compare plots.
+```{r}
+ggplot(data = Agincourt2.5_qc, aes(x=date, y=raw_value)) +
+  geom_line(color = "skyblue") +
+  scale_y_continuous(name = bquote("Temperature ("*degree*"C)"),
+                     breaks = seq(22,32,2), limits = c(22,33)) +
+  labs(subtitle = "Depth 2.5 m") +
+  theme_classic()
+
+ggplot(data = Agincourt10_qc, aes(x=date, y=raw_value)) +
+  geom_line(color = "dodgerblue") +
+  scale_y_continuous(name = bquote("Temperature ("*degree*"C)"),
+                     breaks = seq(22,32,2), limits = c(22,33)) +
+  labs(subtitle = "Depth 10 m") +
+  theme_classic()
+
+ggplot(data = Agincourt12_qc, aes(x=date, y=raw_value)) +
+  geom_line(color = "dodgerblue4") +
+  scale_y_continuous(name = bquote("Temperature ("*degree*"C)"),
+                     breaks = seq(22,32,2), limits = c(22,33)) +
+  labs(subtitle = "Depth 12 m") +
+  theme_classic()
+```
+
