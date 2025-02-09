@@ -26,4 +26,19 @@ The course is organized around four modules that will help undergraduate and gra
 - [Module 3](https://github.com/Analytical-Workflows-for-Earth-Science/Sp2025/tree/main/Module%203) | Analyzing, visualizing, and modeling environmental data
 - [Module 4](https://github.com/Analytical-Workflows-for-Earth-Science/Sp2025/tree/main/Module%204) | Completing and evaluating projects
 
+
+## Instructor Schedule
+| **Week** | **Mon Lecture** | **Tue Lecture** | **Thu Lab** | **Lead Instructor** | **Supporting Instructor**          |
+|----------|-----------------|-----------------|-------------|---------------------|------------------------------------|
+| 1        | 31-Mar          | 1-Apr           | 3-Apr       | Zech                | James (remote from Seattle, WA)    |
+| 2        | 7-Apr           | 8-Apr           | 10-Apr      | James               | Zech (remote from New Orleans, LA) |
+| 3        | 14-Apr          | 15-Apr          | 17-Apr      | Zech                | James                              |
+| 4        | 21-Apr          | 22-Apr          | 24-Apr      | Zech                | James                              |
+| 5        | 28-Apr          | 29-Apr          | 1-May       | James               | Zech                               |
+| 6        | 5-May           | 6-May           | 8-May       | Zech                | James                              |
+| 7        | 12-May          | 13-May          | 15-May      | James               | Zech                               |
+| 8        | 19-May          | 20-May          | 22-May      | Jack (guest)        | James, Zech                        |
+| 9        | 26-May          | 27-May          | 29-May      | James               | Zech (remote from Boulder, CO)     |
+| 10       | 2-Jun           | 3-Jun           | 5-Jun       | Zech                | James                              |
+
 ![Course Icon](General/CourseIcon.jpg)
