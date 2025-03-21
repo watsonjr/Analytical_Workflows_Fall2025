@@ -1,12 +1,12 @@
 # Week 1
-During the first week of the course, we will present a roadmap for the term ahead and provide you with some important transferrable scientific literacy skills. We'll also discuss the term project of workign in teams to solve analyze big environmental data to solve problems in earth systems science.
+During the first week of the course, we will present a roadmap for the term ahead and provide you with some important transferrable skills in scientific literacy. We'll also discuss the term project where you'll be working in teams to analyze big environmental data to solve problems in earth systems science.
 
 ## Lecture 1
 - Introduce instructor and class (10 min)
 - Provide course overview and motivation (30 min)
 - Read and discuss article (40 min)
 
-Required reading (in-class):
+Required reading (in class):
 
 [Machine learning in Earth and environmental science requires education and research policy reforms](https://github.com/Analytical-Workflows-for-Earth-Science/Sp2025/blob/main/Readings/Fleming%20et%20al.%20-%202021%20-%20Machine%20learning%20in%20Earth%20and%20environmental%20scienc.pdf)
 
