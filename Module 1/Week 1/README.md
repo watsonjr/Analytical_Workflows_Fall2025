@@ -39,4 +39,4 @@ Optional reading  (outside of class):
 
 Optional reading (outside of class):
 
-[Empowering learners for the age of artificial intelligence]()
+[Empowering learners for the age of artificial intelligence](https://github.com/Analytical-Workflows-for-Earth-Science/Sp2025/blob/main/Readings/Ga%C5%A1evi%C4%87%20et%20al.%20-%202023%20-%20Empowering%20learners%20for%20the%20age%20of%20artificial%20inte.pdf)
