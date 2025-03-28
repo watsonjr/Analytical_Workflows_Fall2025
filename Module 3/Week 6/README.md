@@ -1,11 +1,12 @@
 # Week 6
+This week will focus on descriptive and confirmatory statistics and data visualization at a very high level.
 
 ## Lecture 11
 
 
 ## Lecture 12
-- Designing data tables (20 min)
-- Designing figures (60 min)
+- Discuss best practices in designing data tables (20 min)
+- Discuss best practices in designing figures (60 min)
 
 Required reading  (in class):
 
