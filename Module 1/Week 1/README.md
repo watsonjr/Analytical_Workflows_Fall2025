@@ -33,9 +33,13 @@ Optional reading  (outside of class):
 [Addressing the impacts of climate change: Federal budgetary risks, adaptation planning, and the climate benefits of federal investments](https://github.com/Analytical-Workflows-for-Earth-Science/Sp2025/blob/main/Readings/White%20Paper%20Example%20-%20OMB.pdf)
 
 ## Lab 1 – Thursday
-- Create GitHub account, download GitHub Desktop, and join the class repository (30 min)
+- Create GitHub account, join the class repository, and download GitHub Desktop  (30 min)
 - Discuss ethical use of LLMs (ChatGPT, Gemini, etc.) in the context of this course (30 min)
 - Generate ideas for group projects and organize into groups of 2-3 students (50 min)
+
+Required reading (in class):
+
+[Reconciling the contrasting narratives on the environmental impact of large language models](link)
 
 Optional reading (outside of class):
 
