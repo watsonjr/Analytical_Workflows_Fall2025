@@ -39,7 +39,7 @@ Optional reading  (outside of class):
 
 Required reading (in class):
 
-[Reconciling the contrasting narratives on the environmental impact of large language models](link)
+[Reconciling the contrasting narratives on the environmental impact of large language models](https://github.com/Analytical-Workflows-for-Earth-Science/Sp2025/blob/main/Readings/Ren%20et%20al.%20-%202024%20-%20Reconciling%20the%20contrasting%20narratives%20on%20the%20envi.pdf)
 
 Optional reading (outside of class):
 
