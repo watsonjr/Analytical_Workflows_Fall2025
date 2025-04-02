@@ -1,0 +1,109 @@
+---
+title: "Lecture 6. Data Validation"
+author: "Zechariah Meunier"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Definitions
+**Data validation** - process of ensuring that data are accurate (i.e., have correct values) and precise (i.e., have consistent values)
+
+**Quality assurance (QA)** - systematic prevention of defects in a product or service so that they meet specified requirements
+
+- proactive approach
+- requires audit of the process or **input**
+
+**Quality control (QC)** - identification and rectification of defects in a product or service so that they meet specified requirements
+
+- reactive approach
+- requires audit of the product or **output**
+
+# Quality assurance
+
+### NOAA Data Example
+We'll begin with a simple example of a dataset from the National Oceanic and Atmospheric Administration (NOAA). These data are the bimonthly values for the Multivariate El Niño Southern Oscillation Index (https://psl.noaa.gov/enso/mei/) or MEI for short.
+
+First, let's load the input data. These data were last updated on March 10, 2025.
+```{r}
+MEI_raw <- read.delim("MEI_raw.txt")
+MEI <- read.table("MEI_cleaned.txt", header = TRUE)
+```
+
+Now take a look at the MEI_raw vs. MEI_cleaned files. In this case, it was easiest to work with the data in a text editor, but larger files might need to be manipulated in R.
+```{r}
+View(MEI_raw)
+View(MEI)
+```
+
+To check how R stores the data in the table and columns, use the `class` function.
+```{r}
+class(MEI)
+class(MEI$YEAR)
+class(MEI$DJ)
+```
+
+Now let's get a sense of the spread of the data using the function `summary`.
+```{r}
+summary(MEI)
+```
+
+Another nice way of summarizing data is to use the `boxplot` function.
+```{r}
+boxplot(MEI)
+```
+
+As you can see, the year column is distorting the y-axis, so let's remove it using a trick by indexing into the columns and removing the first column.
+```{r}
+boxplot(MEI[,-1])
+```
+
+However, there's still some issues with major outliers. So let's remove the last row also. If you don't know how many rows are present, use the `nrow` function. Similarly, you can use `ncol` to determine the number of columns present.
+```{r}
+boxplot(MEI[-nrow(MEI),-1])
+```
+ 
+To view the top few rows of the data frame, use the `head` function. Similarly, use the `tail` function to view the bottom few rows.
+```{r}
+head(MEI)
+tail(MEI)
+```
+As you can see, there's an issue with the last row having -999.000 as a placeholder instead of `NA`. There are several ways to convert these values, some of which are more work than others.
+
+We could manually replace the values in a vector using `replace` and fix it in 9 lines of code.
+```{r}
+MEI$FM <- replace(MEI$FM, MEI$FM == -999, NA)
+MEI$MA <- replace(MEI$MA, MEI$MA == -999, NA)
+MEI$AM <- replace(MEI$AM, MEI$AM == -999, NA)
+MEI$MJ <- replace(MEI$MJ, MEI$MJ == -999, NA)
+MEI$JJ <- replace(MEI$JJ, MEI$JJ == -999, NA)
+MEI$JA <- replace(MEI$JA, MEI$JA == -999, NA)
+MEI$AS <- replace(MEI$AS, MEI$AS == -999, NA)
+MEI$SO <- replace(MEI$SO, MEI$SO == -999, NA)
+MEI$ON <- replace(MEI$ON, MEI$ON == -999, NA)
+MEI$ND <- replace(MEI$ND, MEI$ND == -999, NA)
+tail(MEI)
+```
+
+We could use a for-loop and fix it in 4 lines of code.
+```{r}
+MEI <- read.table("MEI_cleaned.txt", header = TRUE)
+
+for (i in 1:ncol(MEI)) {
+  col <- colnames(MEI)[i]
+  MEI[[col]] <- replace(MEI[[col]], MEI[[col]] == -999, NA)
+}
+
+tail(MEI)
+```
+
+We could use the `lapply` function and fix it in 1 line of code.
+```{r}
+MEI <- read.table("MEI_cleaned.txt", header = TRUE)
+
+MEI[] <- lapply(MEI, function(x) replace(x, x == -999, NA))
+
+tail(MEI)
+```
+
+
+# Quality control
