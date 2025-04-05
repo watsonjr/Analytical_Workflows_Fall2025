@@ -21,7 +21,7 @@ output: html_document
 # Quality assurance
 
 ### NOAA Data Example
-We'll begin with a simple example of a dataset from the National Oceanic and Atmospheric Administration (NOAA). These data are the bimonthly values for the Multivariate El Niño Southern Oscillation Index (https://psl.noaa.gov/enso/mei/) or MEI for short.
+We'll begin with a simple example of a dataset from the National Oceanic and Atmospheric Administration (NOAA). These data are the bimonthly values for the Multivariate El Niño Southern Oscillation Index (https://psl.noaa.gov/enso/mei/) or MEI for short. Our end goal is to create a time series showing the El Niño and La Niña events over the past 46 years.
 
 First, let's load the input data. These data were last updated on March 10, 2025.
 ```{r}
@@ -61,7 +61,7 @@ However, there's still some issues with major outliers. So let's remove the last
 ```{r}
 boxplot(MEI[-nrow(MEI),-1])
 ```
- 
+
 To view the top few rows of the data frame, use the `head` function. Similarly, use the `tail` function to view the bottom few rows.
 ```{r}
 head(MEI)
@@ -69,7 +69,7 @@ tail(MEI)
 ```
 As you can see, there's an issue with the last row having -999.000 as a placeholder instead of `NA`. There are several ways to convert these values, some of which are more work than others.
 
-We could manually replace the values in a vector using `replace` and fix it in 9 lines of code.
+We could manually replace the values in a vector using `replace` and fix it in 10 lines of code.
 ```{r}
 MEI$FM <- replace(MEI$FM, MEI$FM == -999, NA)
 MEI$MA <- replace(MEI$MA, MEI$MA == -999, NA)
@@ -105,5 +105,64 @@ MEI[] <- lapply(MEI, function(x) replace(x, x == -999, NA))
 tail(MEI)
 ```
 
+Now that the erroneous values are removed, let's look at the boxplot again. Add x-axis and y-axis labels to make it more readable.
+```{r}
+boxplot(MEI[,-1], ylab = "Multivariate ENSO Index", xlab = "Month")
+```
+
+Of course, these data actually represent a time series, which is best plotted using a line graph. We need to wrangle our dataset to plot a time series, which we'll do using functions from the R packages `tidyr`, `dplyr`, and `ggplot2`.
+```{r, include=FALSE}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
+The dataset is currently in "wide" format, meaning there are redundant variable types across the columns. We need to convert it to "long" format, so that the same variables are stacked in a single column. We'll use the function `pivot_longer` to achieve this. The important arguments are:
+
+- `cols` for the columns to pivot into longer format
+- `names_to` to specify the new column to create from the information stored in `cols`
+- `values_to` to specify the new column to create from the data stored in the cell values.
+```{r}
+MEI_long <- MEI %>%
+  pivot_longer(cols = DJ:ND, names_to = "Month", values_to = "MEI")
+
+head(MEI_long)
+```
+
+Now we want to create a new column that combines the information stored in `YEAR` and `Month`. However, `Month` currently stores a 2-letter code that R doesn't understand, so first we need to create another column with numerical data. We'll make these new columns with the function `mutate`.
+```{r}
+MEI_long <- MEI_long %>%
+  mutate(MonthNum = case_match(Month,
+                               "DJ" ~ "01",
+                               "JF" ~ "02",
+                               "FM" ~ "03",
+                               "MA" ~ "04",
+                               "AM" ~ "05",
+                               "MJ" ~ "06",
+                               "JJ" ~ "07",
+                               "JA" ~ "08",
+                               "AS" ~ "09",
+                               "SO" ~ "10",
+                               "ON" ~ "11",
+                               "ND" ~ "12"),
+         Date = paste0(MonthNum, "/" , 1, "/", YEAR))
+
+MEI_long$Date <- as.Date(MEI_long$Date, "%m/%d/%Y")
+
+head(MEI_long)
+```
+
+Let's make a quick line graph showing the Multivariate ENSO Index over time! Why do we see this warning?
+```{r}
+MEIseries <- ggplot(data = MEI_long, aes(x = Date, y = MEI)) +
+  geom_line()
+
+MEIseries
+```
+
 
 # Quality control
+
+### NOAA Data Example
+
+We have two new products: a dataframe called `MEI_long` and a time series plot called `MEIseries`. Now let's follow the principles of quality control to improve these data products!
