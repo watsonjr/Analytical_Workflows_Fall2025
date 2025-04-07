@@ -67,6 +67,7 @@ To view the top few rows of the data frame, use the `head` function. Similarly, 
 head(MEI)
 tail(MEI)
 ```
+
 As you can see, there's an issue with the last row having -999.000 as a placeholder instead of `NA`. There are several ways to convert these values, some of which are more work than others.
 
 We could manually replace the values in a vector using `replace` and fix it in 10 lines of code.
@@ -166,3 +167,106 @@ MEIseries
 ### NOAA Data Example
 
 We have two new products: a dataframe called `MEI_long` and a time series plot called `MEIseries`. Now let's follow the principles of quality control to improve these data products!
+
+First, let's make our dataset more meaningful by categorizing the bimonthly MEI as El Niño ($MEI \ge 0.5$), neutral ($-0.05 < MEI < 0.05$), or La Niña ($MEI \le -0.5$). We'll make a new column to store the ENSO phase using `mutate` and nested `if_else` statements. Let's make sure our logic was applied correctly using the `table` function.
+```{r}
+MEI_long <- MEI_long %>% 
+  mutate(ENSOphase = if_else(MEI < -0.49, "La Nina",
+                             if_else(MEI > 0.49, "El Nino",
+                                     "Neutral")))
+
+table(MEI_long$ENSOphase, MEI_long$MEI)
+```
+
+While our categories are correct, notice how the ENSO phases appear in alphabetical order, even though the ENSO phase variable actually shows ordinal data. Let's save this as a factor and set the levels of the factor in the correct order.
+```{r}
+MEI_long$ENSOphase <- factor(MEI_long$ENSOphase,
+                             levels = c("La Nina","Neutral","El Nino"))
+
+head(MEI_long)
+```
+
+Great! Now let's work on improving our plot `MEIseries` using some default themes.
+```{r}
+MEIseries
+MEIseries + theme_classic()
+MEIseries + theme_bw()
+MEIseries + theme_minimal()
+```
+
+Because journals do not typically want the horizontal or vertical grid lines on plots, `theme_classic` is the best choice here. But there are important thresholds in these data, so we'll add three horizontal lines using `geom_hline`.
+```{r}
+MEIseries + theme_classic() +
+  geom_hline(yintercept = 0, linetype = "solid") +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  geom_hline(yintercept = -0.5, linetype = "dashed")
+```
+
+Now we can see when the time series was in the three ENSO phases, but let's add some colored columns to make it more obvious! We'll also remove the missing data from `MEI_long` using `filter`.
+```{r}
+ggplot(data = filter(MEI_long, !is.na(MEI)), aes(x = Date, y = MEI)) +
+  geom_line() + theme_classic() +
+  geom_hline(yintercept = 0, linetype = "solid") +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  geom_hline(yintercept = -0.5, linetype = "dashed") + 
+  geom_col(aes(x = Date, y = MEI, fill = ENSOphase))
+```
+
+The default colors don't match our intuition of El Niño being warm and La Niña being cool, so let's change these using `scale_fill_manual`. We'll also use the character code for ñ (`\u00F1`). In addition, let's make the black line bigger and draw it on top of the columns.
+```{r}
+ggplot(data = filter(MEI_long, !is.na(MEI)), aes(x = Date, y = MEI)) +
+  theme_classic() +
+  geom_hline(yintercept = 0, linetype = "solid") +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  geom_hline(yintercept = -0.5, linetype = "dashed") + 
+  geom_col(aes(x = Date, y = MEI, fill = ENSOphase)) +
+  geom_line(linewidth = 0.7) +
+  scale_fill_manual(name = "ENSO Phase",
+                    values = c("dodgerblue","gray36","firebrick"),
+                    labels = c("La Ni\u00F1a","Neutral","El Ni\u00F1o"))
+```
+
+We're almost done, but let's improve the x-axis and y-axis with better titles and breaks. We also want to put the legend above the figure and make all the font black.
+```{r}
+ggplot(data = filter(MEI_long, !is.na(MEI)), aes(x = Date, y = MEI)) +
+  theme_classic() +
+  geom_hline(yintercept = 0, linetype = "solid") +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  geom_hline(yintercept = -0.5, linetype = "dashed") + 
+  geom_col(aes(x = Date, y = MEI, fill = ENSOphase)) +
+  geom_line(linewidth = 0.7) +
+  scale_x_date(breaks = seq(as.Date("1980-01-01"), as.Date("2025-01-01"),
+                            by = "5 years"),
+               date_labels = "%Y") +
+  scale_y_continuous(name = "Multivariate ENSO Index") +
+  scale_fill_manual(name = "ENSO Phase",
+                    values = c("dodgerblue","gray36","firebrick"),
+                    labels = c("La Ni\u00F1a","Neutral","El Ni\u00F1o")) +
+  theme(legend.position = "top", 
+        axis.text = element_text(color = "black"))
+```
+
+To save this figure, use the `ggsave` function and specify the size and units.
+```{r}
+MEIseriesfinal <-
+  ggplot(data = filter(MEI_long, !is.na(MEI)), aes(x = Date, y = MEI)) +
+  theme_classic() +
+  geom_hline(yintercept = 0, linetype = "solid") +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  geom_hline(yintercept = -0.5, linetype = "dashed") + 
+  geom_col(aes(x = Date, y = MEI, fill = ENSOphase)) +
+  geom_line(linewidth = 0.7) +
+  scale_x_date(breaks = seq(as.Date("1980-01-01"), as.Date("2025-01-01"),
+                            by = "5 years"),
+               date_labels = "%Y") +
+  scale_y_continuous(name = "Multivariate ENSO Index") +
+  scale_fill_manual(name = "ENSO Phase",
+                    values = c("dodgerblue","gray36","firebrick"),
+                    labels = c("La Ni\u00F1a","Neutral","El Ni\u00F1o")) +
+  theme(legend.position = "top", 
+        axis.text = element_text(color = "black"))
+
+ggsave(MEIseriesfinal, filename = "MEI Time Series.png",
+       dpi = 2000, height = 4, width = 6, units = "in")
+```
+
