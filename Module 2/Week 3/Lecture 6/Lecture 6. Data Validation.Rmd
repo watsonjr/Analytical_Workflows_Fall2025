@@ -5,7 +5,11 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-# Definitions
+## Maxim of today's lesson: **s#!t in** $\rightarrow$ **s#!t out**
+
+Our goals as ecological and earth system data scientists are to extract meaning from big environmental data and to provide valuable insight to stakeholders. This can only be done through careful work with data at every stage in the data life cycle.
+
+## Definitions
 **Data validation** - process of ensuring that data are accurate (i.e., have correct values) and precise (i.e., have consistent values)
 
 **Quality assurance (QA)** - systematic prevention of defects in a product or service so that they meet specified requirements
@@ -18,10 +22,62 @@ output: html_document
 - reactive approach
 - requires audit of the product or **output**
 
-# Quality assurance
+## Quality Assurance Considerations
 
-### NOAA Data Example
-We'll begin with a simple example of a dataset from the National Oceanic and Atmospheric Administration (NOAA). These data are the bimonthly values for the Multivariate El Niño Southern Oscillation Index (https://psl.noaa.gov/enso/mei/) or MEI for short. Our end goal is to create a time series showing the El Niño and La Niña events over the past 46 years.
+The primary goal of QA is to scrub the **s#!t** from the input to the analytical pipeline.
+
+1) Consider the format of the raw data:
+
+- relational (i.e., tabular) vs. non-relational (e.g., document, graph) data
+- row count and meaning
+- column count and meaning
+- data types (e.g., categorical or numerical)
+- file type
+
+Useful R functions:
+```{r}
+head(CO2)
+tail(CO2)
+nrow(CO2)
+ncol(CO2)
+```
+
+
+2) Consider the values of each variable:
+
+- minimum and maximum, especially outliers beyond physical limits (e.g., water temperature above 20$^\circ$C on the Oregon coast)
+- characters instead of numerics
+- appropriate units and scale
+- combinations of values
+
+Useful R functions:
+```{r}
+summary(CO2)
+min(CO2$conc)
+max(CO2$conc)
+class(CO2$Type)
+unique(CO2$Type)
+table(CO2$Type, CO2$Treatment)
+```
+
+## Quality Control Considerations
+
+The primary goal of QC is to scrub the **s#!t** from the output from the analytical pipeline.
+
+1) Consider future data users:
+
+- Do the metadata explictly explain basic information about the data that can make tracking and working with the data easier?
+- Will other scientists be able to interpret my summary figures and tables?
+- Will other scientists or future me be able to read and understand my code?
+
+2) Consider the stakeholders: 
+
+- Will non-scientist subject matter experts be able to interpret my summary figures and tables?
+- Do my products contain proprietary information that must be redacted?
+
+
+## NOAA Data Example
+We'll work with a simple dataset from the National Oceanic and Atmospheric Administration (NOAA). These data are the bimonthly values for the Multivariate El Niño Southern Oscillation Index (https://psl.noaa.gov/enso/mei/) or MEI for short. Our end goal is to create a time series showing the El Niño and La Niña events over the past 46 years.
 
 First, let's load the input data. These data were last updated on March 10, 2025.
 ```{r}
@@ -160,11 +216,6 @@ MEIseries <- ggplot(data = MEI_long, aes(x = Date, y = MEI)) +
 
 MEIseries
 ```
-
-
-# Quality control
-
-### NOAA Data Example
 
 We have two new products: a dataframe called `MEI_long` and a time series plot called `MEIseries`. Now let's follow the principles of quality control to improve these data products!
 
