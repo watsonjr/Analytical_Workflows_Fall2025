@@ -1,0 +1,6 @@
+---
+title: "Lab 3. Declining Monarch Populations"
+author: "your name here"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
