@@ -1,4 +1,4 @@
-# Analytical Workflows for Earth Systems Science (nice!)
+# Analytical Workflows for Earth Systems Science
 
 Welcome to the course webpage for GEOG 463/563 at Oregon State University! This repository will contain all code templates, data files, and other resources for the course and is linked to our [GitHub Classroom](https://classroom.github.com/classrooms/192258322-analytical-workflows-for-earth-science-2025).
 
