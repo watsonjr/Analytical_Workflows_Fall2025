@@ -1,0 +1,156 @@
+---
+title: "Lab 3. Declining Monarch Populations"
+author: "your name here"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Introduction
+
+The goal of this lab is to study temporal trends in the western populations of the monarch butterfly (*Danaus plexippus plexippus*). Although this is the iconic butterfly species -- featured as the default butterfly emoji on your phone -- the migratory subspecies is classified as vulnerable by the International Union for the Conservation of Nature (IUCN). We'll investigate the abundances of western monarch butterflies in their overwintering areas on the coast of central and southern California, where the adult super-generation spends 4-5 months.
+
+We'll measure some features of monarch ecology based on their population size at time $t$ ($N_t$). Specifically, we will calculate the finite population growth rate ($\lambda$), the change in population size over time ($\Delta N/\Delta t$), and the change in finite population growth rate over time ($\Delta\lambda/\Delta t$). These quantities can be calculated with the following equations:
+
+$\lambda_{t} = N_{t+1}/N_t$
+
+$\frac{\Delta N}{\Delta t} = \frac{N_t-N_{t-1}}{t_2-t_1}$
+
+$\frac{\Delta\lambda}{\Delta t} = \frac{\lambda_t-\lambda_{t-1}}{t_2-t_1}$
+
+The magnitude of lambda indicates how the population is changing:
+
+-   population growth when $\lambda > 1$
+-   population stability when $\lambda = 1$
+-   population decline when $\lambda < 1$
+
+# Data Inputting, Cleaning, and Formatting
+
+Read in the csv file on monarch butterfly populations and store it as a data frame.
+
+```{r}
+
+```
+
+Look at the dataset to get a sense of how it's formatted. What do the rows and columns show? Are the columns named appropriately?
+
+```{r}
+
+```
+
+The dataset is currently in wide format, but to analyze it, we need to convert it to long format. Use the function `pivot_longer` from `tidyr` to accomplish this. Make two new columns, one for the count and one for the count time.
+
+```{r}
+
+```
+
+Check the object class of your new count time column. What kind of variable is it?
+
+```{r}
+
+```
+
+We want to calculate several population ecology metrics for the monarchs, so we need to convert count time from a character to a numeric variable. This will require several steps. First, look at the different values contained in count time.
+
+```{r}
+
+```
+
+Notice how these values begin with one of the following:
+
+-   "ES" for early season counts, usually around Halloween (Oct. 31)
+-   "X" for peak season counts, usually around Thanksgiving (use Nov. 25)
+-   "LS" for late season counts, usually around New Years Eve (Dec. 31)
+
+Let's create a new fractional year variable for each of these prefixes using the `yday` function in the `lubridate` library. Use the dates given above as a fraction of the number of days in a year. Round the values of these variables to three decimal places.
+
+```{r}
+
+```
+
+Now add to your long format data frame a new column that converts the count time to a decimal year. Some useful functions are `str_starts` and `str_remove` from the `stringr` package, `mutate` and `case_when` from `dplyr`.
+
+```{r}
+
+```
+
+Double-check that your decimal years make sense using the `table` function.
+
+```{r}
+
+```
+
+Although we went through the trouble of accounting for early and late season counts, these were not consistently recorded. Therefore, it's best to remove these rows using `filter`.
+
+```{r}
+
+```
+
+Now we can calculate the second metric, population growth rate ($\lambda$)! It's important to ensure that we're calculating separate rates per site, so you'll want to use the `group_by` function from `dplyr`. We also want to compare apples to apples, so only use the peak season counts beginning with "X" (see step above). The `lead` function is super handy here. It's also a good idea to replace any divide by zero errors (`Inf` in R) with 0.
+
+```{r}
+
+```
+
+Just two more population metrics to calculate: $\Delta N/\Delta t$ and $\Delta\lambda/\Delta t$. Remember to calculate these for each site separately. The `lag` function is useful here.
+
+```{r}
+
+```
+
+# Data Visualization
+
+Now that we have our four population ecology metrics, let's make some graphs!
+
+First, we'll create a time series plot with `ggplot2` that shows the mean population abundance per year ($N_t$) across all sites.
+
+```{r}
+library(ggplot2)
+
+ggplot(data = monarchs_final, aes(x = Year)) +
+  stat_summary(aes(y = Count), fun = "mean", geom = "line", color = "black") +
+  theme_classic()
+```
+
+Second, modify this code to create a time series plot that shows the mean population growth rate ($\lambda$) across all sites.
+
+```{r}
+
+```
+
+Third, modify this code to create a time series plot that shows the mean change in population size over time ($\Delta N/\Delta t$) across all sites.
+
+```{r}
+
+```
+
+Fourth, modify this code to create a time series plot that shows the mean change in finite population growth rate over time ($\Delta\lambda/\Delta t$) across all sites.
+
+```{r}
+
+```
+
+Now that we have a sense of the overall population trends, let's zoom in to a single site where there are no missing data: Natural Bridges State Beach, Santa Cruz, CA (ID 2998). Create the four plots as above, copying the template provided.
+
+```{r}
+NBSB <- filter(monarchs_final, SITE.ID == 2998)
+
+ggplot(data = NBSB, aes(x = Year)) +
+  geom_line(aes(y = Count), color = "black") +
+  theme_classic()
+```
+
+Finally, choose one of the plots you've already created and refine it. Some ideas include better labels, more axis ticks, and multiple lines on a single figure.
+
+```{r}
+
+```
+
+# Discussion
+
+**Grad students only**
+
+# References
+
+**Grad students only**
