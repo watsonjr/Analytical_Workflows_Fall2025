@@ -3,7 +3,7 @@
 ## Clean messy data about Monarch butterfly populations (90 min)
 1) Read about the Western Monarch Count and download the summarized data [here](https://westernmonarchcount.org/data/).
 2) Open the downloaded file and go to the "Site Counts by County" tab. Copy cells A1:AO386 and paste the values (right-click > Paste Special... > Values) to a new workbook. Save the new workbook as a comma-separated value (csv) file with an informative title.
-3) Open the R Markdown file "Lab 3. Declining Monarch Populations" and follow the instructions.
+3) Open the R Markdown file "Lab 3. Declining Monarch Populations (no code)" and follow the instructions.
 
 
 ## Generate figures and interpret findings (20+ min)
