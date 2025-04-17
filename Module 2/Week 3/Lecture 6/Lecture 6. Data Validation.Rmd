@@ -219,7 +219,7 @@ MEIseries
 
 We have two new products: a dataframe called `MEI_long` and a time series plot called `MEIseries`. Now let's follow the principles of quality control to improve these data products!
 
-First, let's make our dataset more meaningful by categorizing the bimonthly MEI as El Niño ($MEI \ge 0.5$), neutral ($-0.05 < MEI < 0.05$), or La Niña ($MEI \le -0.5$). We'll make a new column to store the ENSO phase using `mutate` and nested `if_else` statements. Let's make sure our logic was applied correctly using the `table` function.
+First, let's make our dataset more meaningful by categorizing the bimonthly MEI as El Niño ($MEI \ge 0.5$), neutral ($-0.5 < MEI < 0.5$), or La Niña ($MEI \le -0.5$). We'll make a new column to store the ENSO phase using `mutate` and nested `if_else` statements. Let's make sure our logic was applied correctly using the `table` function.
 ```{r}
 MEI_long <- MEI_long %>% 
   mutate(ENSOphase = if_else(MEI < -0.49, "La Nina",
