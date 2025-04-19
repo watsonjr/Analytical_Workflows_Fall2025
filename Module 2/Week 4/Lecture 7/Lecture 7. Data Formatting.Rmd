@@ -1,0 +1,191 @@
+---
+title: "Lecture 7. Data Formatting"
+author: "Zechariah Meunier"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Data Types and Structures
+
+Generally, data exist in two main types, each of which has three sub-types:
+
+-   **Qualitative**: categorical data
+    -   Nominal data are names that cannot be ordered (e.g., country names)
+    -   Ordinal data are names that can be ordered (e.g., insect life stage)
+    -   Boolean data are names for logical outcomes (e.g., true or false)
+-   **Quantitative**: numerical data
+    -   Discrete (integer) data are numerical and cannot be divided (e.g., turkey abundance)
+    -   Continuous (ratio) data are numerical and can be divided (e.g., transect distance)
+    -   Complex data are numerical and include imaginary numbers (e.g., 3 + 2i)
+
+In R and other programming languages, these general data types map onto specific data types with some additional types.
+
+| General Data Type | R Data Type      |
+|-------------------|------------------|
+| Nominal           | Character        |
+| Ordinal           | Factor           |
+| Boolean           | Logical          |
+| Discrete          | Numeric, integer |
+| Continuous        | Numeric, double  |
+| Complex           | Numeric, complex |
+
+We can determine the data type, or object class, of data using the `class` function.
+
+```{r}
+a <- "7"
+class(a)
+b <- factor("7")
+class(b)
+c <- TRUE
+class(c)
+d <- 7L
+class(d)
+e <- 7.0
+class(e)
+f <- 3 + 2i
+class(f)
+```
+
+There are also several kinds of data structures (sometimes called structs), which organize and store data in specific ways. Data structures are organized into two main types, each of which has several sub-types:
+
+-   **Primitive**: basic data structures do not contain any additional methods or properties
+
+    -   Integers
+    -   Floating point numbers (sometimes called floats), which are limited precision continuous numbers
+    -   Characters
+    -   Booleans
+
+-   **Non-primitive**: complex data structures contain more information, often organized in rows and columns with dimensions given as rows $\times$ columns
+
+    -   Vector: one-dimensional structure ($1 \times n$ or $n \times 1$) where all the elements must be the same type
+
+        -   When $n=1$ it is called a scalar
+
+    -   Matrix: two-dimensional structure ($m \times n$) with one data type for all columns
+
+    -   Array: multidimensional structure ($m \times n \times o \times \cdot \cdot \cdot$) with one data type for all matrices
+
+    -   Data frame: two-dimensional structure ($m \times n$) where each column is the same length but can differ in data type
+
+        -   A typical data table
+
+    -   List: any dimensional structure that can contain multiple data types
+
+```{r}
+w <- c("a","b","c","d","e","f")
+w
+class(w)
+
+x <- c(a,b,c,d,e,f)
+x
+class(x)
+
+y <- matrix(data = c(w,x), nrow = 6, ncol = 2)
+y
+class(y)
+
+z <- data.frame(col1 = w, col2 = x)
+z
+class(z)
+```
+
+## Coral Reef Case Study
+
+Today we'll be formatting data from the Australian Institute of Marine Science (AIMS) Long-term Monitoring Program (LTMP) for benthic coverage of hard coral, soft coral, algae, and other organisms on the Great Barrier Reef.
+
+First, read in the data, then look at the first few rows.
+
+```{r}
+aims <- read.csv("ltmp_hc_sc_a_by_site_1992_2022.csv")
+head(aims)
+```
+
+What kind of data structure is this? Do all of the columns have the appropriate data type?
+
+We want to change the data type of some columns from character to factor. For example, let's change the column `SECTOR` to a factor with the individual sectors ordered from north to south.
+
+First, use the `unique` function to look at the values of the sectors, which are two-letter abbreviations for the sectors described in the metadata.
+
+```{r}
+unique(aims$SECTOR)
+```
+
+To determine the north-south orientation of these sectors, let's leverage the GPS coordinates in the columns `LONGITUDE` and `LATITUDE` as x and y coordinates on a simple map.
+
+```{r}
+library(ggplot2)
+ggplot(data = aims, aes(x = LONGITUDE, y = LATITUDE, color = SECTOR)) +
+  geom_point() +
+  scale_color_brewer(palette = "Paired")
+```
+
+We can double-check our values by referencing the AIMS LTMP map showing the sectors and regions.
+
+[AIMS LTMP map](https://www.aims.gov.au/information-centre/news-and-stories/initial-great-barrier-reef-monitoring-results-show-coral-mortality-north-due-bleaching-and-cyclones)
+
+![]()If everything looks correct, let's set `SECTOR` as a factor with the levels arranged north-south.
+
+```{r}
+aims$SECTOR <- factor(aims$SECTOR,
+                      levels = c("CG","PC","CL","CA","IN",
+                                 "TO","WH","PO","SW","CB"))
+unique(aims$SECTOR)
+```
+
+Notice how the map also groups the sectors into three regions on the Great Barrier Reef: Northern, Central, and Southern. We want to add a new column to our data frame containing the information for region.
+
+There are a few ways to accomplish this. First, we could create a new data frame and perform a join operation using `left_join` from the `dplyr` package.
+
+```{r}
+library(dplyr)
+Regions <- data.frame(REGION = c("Northern","Northern","Northern",
+                                 "Central","Central","Central","Central",
+                                 "Southern","Southern","Southern"),
+                      SECTOR = levels(aims$SECTOR))
+
+aims2 <- left_join(aims, Regions, by = "SECTOR")
+```
+
+Second, we could use `mutate` and `case_match` functions on the original data frame.
+
+```{r}
+aims <- aims %>%
+  mutate(REGION = case_match(SECTOR,
+                            "CG" ~ "Northern",
+                            "PC" ~ "Northern",
+                            "CL" ~ "Northern", 
+                            "CA" ~ "Central",
+                            "IN" ~ "Central",
+                            "TO" ~ "Central",
+                            "WH" ~ "Central",
+                            "PO" ~ "Southern",
+                            "SW" ~ "Southern",
+                            "CB" ~ "Southern"))
+```
+
+Third, we could use nested `if_else` statements, but that's too much work. Remember that we also want our new column to be formatted as a factor variable.
+
+```{r}
+aims$REGION <- factor(aims$REGION,
+                      levels = c("Northern","Central","Southern"))
+```
+
+Let's refine our map with this new information. We'll add the outline of the continent of Australia from the `rnaturalearth` package.
+
+```{r}
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+
+australia <- ne_countries(scale = "medium", country = "Australia", returnclass = "sf")
+
+aims_sf <- aims %>%
+  st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = 4326)
+
+ggplot() +
+  geom_sf(data = australia, fill = NA, color = "black") +
+  geom_sf(data = aims_sf, aes(color = SECTOR, shape = REGION)) +
+  scale_color_brewer(palette = "Paired") +
+  theme_minimal()
+
+```

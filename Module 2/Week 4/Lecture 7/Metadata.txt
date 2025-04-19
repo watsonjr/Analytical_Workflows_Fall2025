@@ -1,0 +1,55 @@
+This data and asssociated usage constraints are described here.
+https://doi.org/10.25845/5c09bc4ff315c
+
+Please cite as such
+Australian Institute of Marine Science (AIMS). 2015, AIMS Long-term Monitoring Program: Video and Photo Transects (Great Barrier Reef), https://doi.org/10.25845/5c09bc4ff315c
+
+For additional information see https://www.aims.gov.au/research-topics/monitoring-and-discovery/monitoring-great-barrier-reef
+
+For more information about the survey methods, review the Standard Operational Procedures and a metadata record that describes technical changes throughout the sampling years:
+Jonker MJ, Bray PE, Johns KA, Osborne KO (2020) Surveys of benthic reef communities using 
+underwater digital photography and counts of juvenile corals. Long Term Monitoring of the Great 
+Barrier Reef - Standard Operational Procedure Number 10, 2nd ed. Australian Institute of Marine 
+Science, Townsville, Australia. 36 pp. https://doi.org/10.25845/jjzj-0v14 
+
+
+Copy this link below to view a map with the AIMS sectors and survey reefs:
+https://apps.aims.gov.au/reef-monitoring/sector
+
+Latest Reporting tool: https://apps.aims.gov.au/reef-monitoring/reefs
+
+
+
+Data Dictionary - AIMS Long-term Monitoring Program: Video and Photo Transects (Great Barrier Reef)
+
+Column 	Description
+SECTOR		CA – Cairns
+		CB – Capricorn-Bunker
+		CG – Cape Grenville
+		CL – Cooktown-Lizard Island
+		IN - Innisfail
+		PC – Princess Charlotte Bay
+		PO - Pomey
+		SW – Swain
+		TO - Townsville
+SHELF		I – Inshore GBR
+		M – Mid-shelf GBR
+		O – Outer-shelf GBR
+REEF_NAME	The reef name as shown in the Great Barrier Reef Gazetteer.
+REEF_ID		Unique Identifier assigned to each reef
+SITE_NO		The site number, where site 1 is the first site encountered when moving in a clockwise direction around the reef.
+TRANSECT_NO	The number of the transect, where transect 1 is the first transect of a site encountered when swimming around the reef in a clockwise direction.
+SITE_LATITUDE	Latitude of reef site in decimal degrees
+SITE_LONIGITUE	Longitude of reef site in decimal degrees
+P_CODE		RM – data collected under LTMP program 
+		RAP – data collected under Representative Areas Program (since 2006)
+		RMRAP- data collected under both LTMP and RAP programs
+VISIT_NUMBER	Indicates the visit number to the reef
+YEAR_CODE	Indicated the year period in which the trip occurred – in YYYY1-YY2 format, i.e. for 199293, ‘1992’ is YYY1, and 93 is YY2 referencing 1993.
+SAMPLE_DATE	The date the survey took place in YYYY-MM-DD
+GROUP_CODE	The cover percentage according to group code, being Algae, Hard Coral, Soft Coral or Other. 
+COVER		Percentage of Cover on reef according to Group-Cover specifications. 
+
+
+End of data dictionary.
+Updated 11-AUG-2023
