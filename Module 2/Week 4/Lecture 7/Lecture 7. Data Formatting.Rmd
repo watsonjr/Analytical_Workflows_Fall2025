@@ -11,12 +11,12 @@ Generally, data exist in two main types, each of which has three sub-types:
 
 -   **Qualitative**: categorical data
     -   Nominal data are names that cannot be ordered (e.g., country names)
-    -   Ordinal data are names that can be ordered (e.g., insect life stage)
+    -   Ordinal data are names that can be ordered (e.g., insect life stages)
     -   Boolean data are names for logical outcomes (e.g., true or false)
 -   **Quantitative**: numerical data
     -   Discrete (integer) data are numerical and cannot be divided (e.g., turkey abundance)
     -   Continuous (ratio) data are numerical and can be divided (e.g., transect distance)
-    -   Complex data are numerical and include imaginary numbers (e.g., 3 + 2i)
+    -   Complex data are numerical and include imaginary numbers (e.g., $3 + 2i$)
 
 In R and other programming languages, these general data types map onto specific data types with some additional types.
 
@@ -28,6 +28,7 @@ In R and other programming languages, these general data types map onto specific
 | Discrete          | Numeric, integer |
 | Continuous        | Numeric, double  |
 | Complex           | Numeric, complex |
+| NA                | Date             |
 
 We can determine the data type, or object class, of data using the `class` function.
 
@@ -71,6 +72,8 @@ There are also several kinds of data structures (sometimes called structs), whic
 
     -   List: any dimensional structure that can contain multiple data types
 
+Let's take a look at some example data structures.
+
 ```{r}
 w <- c("a","b","c","d","e","f")
 w
@@ -91,7 +94,9 @@ class(z)
 
 ## Coral Reef Case Study
 
-Today we'll be formatting data from the Australian Institute of Marine Science (AIMS) Long-term Monitoring Program (LTMP) for benthic coverage of hard coral, soft coral, algae, and other organisms on the Great Barrier Reef.
+### Data Formatting
+
+Today we'll be formatting data from the Australian Institute of Marine Science (AIMS) Long-term Monitoring Program (LTMP) for benthic cover of hard coral, soft coral, algae, and other organisms on the Great Barrier Reef.
 
 First, read in the data, then look at the first few rows.
 
@@ -102,9 +107,29 @@ head(aims)
 
 What kind of data structure is this? Do all of the columns have the appropriate data type?
 
-We want to change the data type of some columns from character to factor. For example, let's change the column `SECTOR` to a factor with the individual sectors ordered from north to south.
+```{r}
+class(aims$SECTOR)
+class(aims$SHELF)
+class(aims$REEF_NAME)
+class(aims$REEF_ID)
+class(aims$SITE_NO)
+class(aims$LATITUDE)
+class(aims$LONGITUDE)
+class(aims$VISIT_NO)
+class(aims$YEAR_CODE)
+class(aims$SAMPLE_DATE)
+class(aims$GROUP_CODE)
+class(aims$COVER)
+```
 
-First, use the `unique` function to look at the values of the sectors, which are two-letter abbreviations for the sectors described in the metadata.
+A couple of these columns have incorrect data types, specifically character instead of factor or date. For example, let's convert the column that stores the sample date to a date data type.
+
+```{r}
+aims$SAMPLE_DATE <- as.Date(aims$SAMPLE_DATE, format = "%Y-%m-%d")
+class(aims$SAMPLE_DATE)
+```
+
+Next, let's change the column `SECTOR` to a factor with the individual sectors ordered from north to south. We'll use the `unique` function to look at the values of the sectors, which are two-letter abbreviations for the sectors described in the metadata.
 
 ```{r}
 unique(aims$SECTOR)
@@ -123,7 +148,7 @@ We can double-check our values by referencing the AIMS LTMP map showing the sect
 
 [AIMS LTMP map](https://www.aims.gov.au/information-centre/news-and-stories/initial-great-barrier-reef-monitoring-results-show-coral-mortality-north-due-bleaching-and-cyclones)
 
-![]()If everything looks correct, let's set `SECTOR` as a factor with the levels arranged north-south.
+If everything looks correct, let's set `SECTOR` as a factor with the levels arranged north-south.
 
 ```{r}
 aims$SECTOR <- factor(aims$SECTOR,
@@ -163,7 +188,7 @@ aims <- aims %>%
                             "CB" ~ "Southern"))
 ```
 
-Third, we could use nested `if_else` statements, but that's too much work. Remember that we also want our new column to be formatted as a factor variable.
+Third, we could use nested `if_else` statements, but that's too much work. Consider that we also want our new column to be formatted as a factor variable.
 
 ```{r}
 aims$REGION <- factor(aims$REGION,
@@ -187,5 +212,98 @@ ggplot() +
   geom_sf(data = aims_sf, aes(color = SECTOR, shape = REGION)) +
   scale_color_brewer(palette = "Paired") +
   theme_minimal()
-
 ```
+
+One more column needs additional scrutiny: `SHELF`. This shows the location of individual reefs in reference to the mainland as `I` for inshore, `M` for mid-shelf, and `O` for outer shelf or offshore. These could also be ordered from proximal to distal to land, so we'll convert `SHELF` to a factor as well.
+
+```{r}
+aims$SHELF <- factor(aims$SHELF,
+                     levels = c("I","M","O"))
+```
+
+### Research Questions
+
+Now let's learn something from this massive data set! We'll investigate the following questions:
+
+1.  How does cover of coral and algae differ among regions of the Great Barrier Reef in recent years?
+
+2.  How has coral cover changed over time?
+
+3.  Does the distance of the reef to the mainland matter for healthy coral populations?
+
+#### Question 1
+
+To see the most recent sampling year with all regions surveyed, use the `table` function. Here, we're also using `year` from the package `lubridate`.
+
+```{r}
+library(lubridate)
+table(year(aims$SAMPLE_DATE),aims$REGION)
+```
+
+Let's go ahead and add a `YEAR` column to our dataset, since the current `YEAR_CODE` isn't very meaningful.
+
+```{r}
+aims$YEAR <- year(aims$SAMPLE_DATE)
+```
+
+For simplicity, we'll look at a boxplot of coral cover from 2021.
+
+```{r}
+ggplot(data = filter(aims, YEAR == 2021), 
+       aes(x = GROUP_CODE, y = COVER, fill = REGION)) +
+  geom_boxplot()
+```
+
+To see how this comparison depends on the year, let's use a new function called `facet_wrap`, which makes individual panels faceted by a variable of interest, in this case `YEAR`.
+
+```{r}
+ggplot(data = filter(aims, YEAR %in% c(2018, 2019, 2020, 2021)), 
+       aes(x = GROUP_CODE, y = COVER, fill = REGION)) +
+  geom_boxplot() +
+  facet_wrap(~YEAR)
+```
+
+So what's the answer to our first research question: How does cover of coral and algae differ among regions of the Great Barrier Reef in recent years?
+
+#### Question 2
+
+Time series data are best displayed in line graphs, so let's adjust our figure accordingly. We'll summarize the data as means and 95% confidence intervals using the `stat_summary` function and make several alterations to the figure to improve its quality.
+
+```{r}
+ggplot(data = aims, aes(x = YEAR, y = COVER, color = GROUP_CODE, fill = GROUP_CODE)) +
+  stat_summary(fun.data = "mean_cl_boot", geom = "ribbon", alpha = 0.5) +
+  stat_summary(fun = "mean", geom = "line") +
+  scale_x_continuous(name = "Year", breaks = seq(1992,2022,2)) +
+  scale_y_continuous(name = "Relative abundance (% cover)", breaks = seq(0,100,20)) +
+  scale_color_brewer(name = "Functional Group", palette = "Set2") +
+  scale_fill_brewer(name = "Functional Group", palette = "Set2") +
+  facet_wrap(~REGION, nrow = 3, ncol = 1) +
+  theme_classic() +
+  theme(legend.position = "top",
+        axis.text = element_text(color = "black"))
+```
+
+So what's the answer to our second research question: How has coral cover changed over time?
+
+#### Question 3
+
+Moving on to our third research question, we want to evaluate the effects of distance to the mainland. While we could calculate a continuous value for distance, we'll instead leverage the factor we created earlier, `SHELF`. We'll change `facet_wrap` to `facet_grid`, which allows us to use an additional variable in our panels.
+
+```{r}
+ggplot(data = aims, aes(x = YEAR, y = COVER, color = GROUP_CODE, fill = GROUP_CODE)) +
+  stat_summary(fun.data = "mean_cl_boot", geom = "ribbon", alpha = 0.5) +
+  stat_summary(fun = "mean", geom = "line") +
+  scale_x_continuous(name = "Year", breaks = seq(1992,2022,5)) +
+  scale_y_continuous(name = "Relative abundance (% cover)", breaks = seq(0,100,20)) +
+  scale_color_brewer(name = "Functional Group", palette = "Set2") +
+  scale_fill_brewer(name = "Functional Group", palette = "Set2") +
+  facet_grid(rows = vars(REGION), cols = vars(SHELF),
+             labeller = labeller(SHELF = c("I"="Inshore",
+                                           "M"="Mid-shelf",
+                                           "O"="Outer shelf"))) +
+  theme_bw() +
+  theme(legend.position = "top",
+        axis.text = element_text(color = "black"))
+```
+
+So what's the answer to our third research question: Does the distance of the reef to the mainland matter for healthy coral populations?
