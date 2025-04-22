@@ -53,9 +53,9 @@ Benefits of committing early and often:
 
 -   Generate countable actions on GitHub, indicating real progress on projects that often take years to complete
 
-The longer you wait to push commits, the more likely you are to forget the nature of the changes in the first place.
+**The longer you wait to push commits, the more likely you are to forget the nature of the changes in the first place.**
 
-When you push commits to GitHub, you must write a message that consists of a required summary (title) and an optional description (more detail). Ideally, you should write commit messages that are easy to understand by others and future you.
+When you push commits to GitHub, you must write a message that consists of a required summary (title) and an optional description (more detail). Good commit messages explain the *what* of your changes; great commit messages include the *why* as well. Ideally, you should write commit messages that are easy to understand by other developers and your future self.
 
 Here are personal examples of good commit messages:
 
@@ -71,10 +71,12 @@ And personal examples of bad commit messages:
 
 -   Just commit already
 
-I tend to write commit messages as present-tense verb clauses, such as:
+I tend to write commit messages as present-tense verb clauses with minimal punctuation, such as:
 
 -   Convert data to factors
 
 -   Add data from Cape Blanco 2022
 
 -   Summarize kelp canopy cover
+
+[Here are other recommendations](https://cbea.ms/git-commit/) for writing git commit messages.
