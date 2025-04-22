@@ -1,0 +1,80 @@
+---
+title: "Lecture 8. Coding Best Practices"
+author: "Zechariah Meunier"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Folders and Filepaths
+
+I like to organize my research projects with the following folder structure:
+
+-   Main Project Folder - everything lives here
+    -   [Repository Name] - everything that I want on GitHub
+        -   Code - code files in any language
+        -   Data - raw and processed data
+            -   One folder per data type
+        -   Figures & Tables - nicely-formatted graphs and summary tables
+        -   Results - statistical tables and quick R output
+    -   Data Entry & Scans - scanned datasheets and Excel spreadsheets for data entry and QA
+    -   Photos - photos of field sites, plots, experimental set up, etc.
+    -   [Target Journal 1] Manuscript
+    -   [Target Journal 2] Manuscript
+    -   Presentations
+        -   One folder per seminar or conference
+
+Because of this nested structure, I can find my files very quickly. But if you aren't working with more than 2-3 files, you should keep all code and data in a single folder.
+
+The nested folder structure also allows me to specify **relative filepaths** (beginning with the current directory) instead of **absolute filepaths** (beginning with the home directory). For example, here is the absolute filepath for this lecture, which begins with my home directory.
+
+```{r}
+getwd()
+```
+
+I can specify a relative filepath using specific sequences of periods and forward slashes. For example, to read-in the data from Lecture 7, I need to go up one directory level, then down the filepath.
+
+```{r}
+aims <- read.csv("../Lecture 7/ltmp_hc_sc_a_by_site_1992_2022.csv")
+```
+
+This would look different if I had set up an R project file, **which you do should for your repositories**.
+
+**Relative filepaths are important because they will work on other computers!**
+
+## Committing to GitHub
+
+Pushing commits to GitHub should become second nature, as comfortable to you as breathing air. You should aim to push commits to your repository immediately after any substantive changes, **but at least the same day** as you update your repository.
+
+Benefits of committing early and often:
+
+-   Keep track of changes with detailed notes
+
+-   Make troubleshooting easier when something breaks
+
+-   Generate countable actions on GitHub, indicating real progress on projects that often take years to complete
+
+The longer you wait to push commits, the more likely you are to forget the nature of the changes in the first place.
+
+When you push commits to GitHub, you must write a message that consists of a required summary (title) and an optional description (more detail). Ideally, you should write commit messages that are easy to understand by others and future you.
+
+Here are personal examples of good commit messages:
+
+-   Create plots for species occurrences: Improve formatting, change size to linewidth
+
+-   Add cross-correlation, wavelet coherence, and GAM analyses
+
+And personal examples of bad commit messages:
+
+-   Lots of updates
+
+-   Add files
+
+-   Just commit already
+
+I tend to write commit messages as present-tense verb clauses, such as:
+
+-   Convert data to factors
+
+-   Add data from Cape Blanco 2022
+
+-   Summarize kelp canopy cover
