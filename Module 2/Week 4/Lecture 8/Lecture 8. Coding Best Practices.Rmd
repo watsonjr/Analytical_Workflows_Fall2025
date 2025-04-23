@@ -83,7 +83,7 @@ I tend to write commit messages as present-tense verb clauses with minimal punct
 
 ## Code Formatting
 
-I tend to write my R code as R Markdown files (like this one) because it's easy to embed my code chunks in longer descriptions. The Integrated Development Environment of RStudio allows for several other features that improve code formatting.
+I tend to write my R code as R Markdown files (like this one) because it's easy to embed my code chunks in longer descriptions. The Integrated Development Environment (IDE) of RStudio allows for several other features that improve code formatting.
 
 First, I can describe what each chunk is doing above in as much detail as I want. I usually write these descriptions as present-tense verb clauses, like my Git commit messages.
 
@@ -95,6 +95,7 @@ Load all packages
 library(lubridate)
 library(dplyr)
 library(ggplot2)
+library(tidyr)
 ```
 
 Add a `YEAR` column and reformat `SECTOR` as a factor
@@ -191,6 +192,47 @@ There are five primary types of cases:
 -   Kebab case: uses hyphens to delineate all words (e.g., new-variable)
 -   Dot case: uses periods to delineate all words (e.g., new.variable)
 
-I typically use camel case for stored variables and Pascal case for data frame variables because they are the most concise forms (i.e., have fewer characters) and are easy to read.
+I typically use snake case for stored data frames, camel case for other stored variables, and Pascal case for data frame variables.
 
+## Code Development
+
+Developing or writing code is like solving a puzzle: there are many possible solutions, but the process can be broken down into many dependent steps or modules. Thus, code should be modular, allowing for reordering and revision as necessary.
+
+One of the most important things is to limit **hard-coding**, or embedding fixed values directly into your code. Instead, it's a good idea to compute values dynamically or load them from external sources.
+
+For example, if my threshold for low coral cover is 25%, I could hard code this.
+
+```{r}
+aims <- aims %>%
+  mutate(LowCoral = if_else(GROUP_CODE == "Hard Coral" & COVER < 25, 1, 0))
+```
+
+Or I could create a variable for low coral cover that I can change as needed.
+
+```{r}
+lowCoral = 25
+
+aims <- aims %>%
+  mutate(LowCoral = if_else(GROUP_CODE == "Hard Coral" & COVER < lowCoral, 1, 0))
+```
+
+But more realistically, low coral is probably in reference to the amount of algae present per survey.
+
+```{r}
+aims2 <- aims %>%
+  group_by(SECTOR, REEF_ID, SITE_NO, VISIT_NO, SAMPLE_DATE) %>%
+  mutate(LowCoral = if_else(GROUP_CODE == "Hard Coral" &
+                              COVER[GROUP_CODE == "Hard Coral"] <
+                              COVER[GROUP_CODE == "Algae"], 1, 0)) %>%
+  ungroup()
+```
+
+Determine the proportion of surveys with "low" coral cover for the two methods
+
+```{r}
+#Surveys where coral cover was below 25%
+sum(aims$LowCoral)/nrow(filter(aims, GROUP_CODE == "Hard Coral"))
+#Surveys where coral cover is less than algae cover
+sum(aims2$LowCoral)/nrow(filter(aims2, GROUP_CODE == "Hard Coral"))
+```
 

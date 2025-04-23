@@ -460,8 +460,8 @@ recommendations</a> for writing git commit messages.</p>
 <h2>Code Formatting</h2>
 <p>I tend to write my R code as R Markdown files (like this one) because
 it’s easy to embed my code chunks in longer descriptions. The Integrated
-Development Environment of RStudio allows for several other features
-that improve code formatting.</p>
+Development Environment (IDE) of RStudio allows for several other
+features that improve code formatting.</p>
 <p>First, I can describe what each chunk is doing above in as much
 detail as I want. I usually write these descriptions as present-tense
 verb clauses, like my Git commit messages.</p>
@@ -488,6 +488,8 @@ installed.</p>
 ##     intersect, setdiff, setequal, union</code></pre>
 <pre class="r"><code>library(ggplot2)</code></pre>
 <pre><code>## Warning: package &#39;ggplot2&#39; was built under R version 4.2.3</code></pre>
+<pre class="r"><code>library(tidyr)</code></pre>
+<pre><code>## Warning: package &#39;tidyr&#39; was built under R version 4.2.3</code></pre>
 <p>Add a <code>YEAR</code> column and reformat <code>SECTOR</code> as a
 factor</p>
 <pre class="r"><code>aims$YEAR &lt;- year(aims$SAMPLE_DATE)
@@ -584,11 +586,47 @@ new-variable)</li>
 <li>Dot case: uses periods to delineate all words (e.g.,
 new.variable)</li>
 </ul>
-<p>I typically use camel case for stored variables and Pascal case for
-data frame variables because they are the most concise forms (i.e., have
-fewer characters) and are easy to read.</p>
+<p>I typically use snake case for stored data frames, camel case for
+other stored variables, and Pascal case for data frame variables.</p>
 </div>
 </div>
+</div>
+<div id="code-development" class="section level2">
+<h2>Code Development</h2>
+<p>Developing or writing code is like solving a puzzle: there are many
+possible solutions, but the process can be broken down into many
+dependent steps or modules. Thus, code should be modular, allowing for
+reordering and revision as necessary.</p>
+<p>One of the most important things is to limit
+<strong>hard-coding</strong>, or embedding fixed values directly into
+your code. Instead, it’s a good idea to compute values dynamically or
+load them from external sources.</p>
+<p>For example, if my threshold for low coral cover is 25%, I could hard
+code this.</p>
+<pre class="r"><code>aims &lt;- aims %&gt;%
+  mutate(LowCoral = if_else(GROUP_CODE == &quot;Hard Coral&quot; &amp; COVER &lt; 25, 1, 0))</code></pre>
+<p>Or I could create a variable for low coral cover that I can change as
+needed.</p>
+<pre class="r"><code>lowCoral = 25
+
+aims &lt;- aims %&gt;%
+  mutate(LowCoral = if_else(GROUP_CODE == &quot;Hard Coral&quot; &amp; COVER &lt; lowCoral, 1, 0))</code></pre>
+<p>But more realistically, low coral is probably in reference to the
+amount of algae present per survey.</p>
+<pre class="r"><code>aims2 &lt;- aims %&gt;%
+  group_by(SECTOR, REEF_ID, SITE_NO, VISIT_NO, SAMPLE_DATE) %&gt;%
+  mutate(LowCoral = if_else(GROUP_CODE == &quot;Hard Coral&quot; &amp;
+                              COVER[GROUP_CODE == &quot;Hard Coral&quot;] &lt;
+                              COVER[GROUP_CODE == &quot;Algae&quot;], 1, 0)) %&gt;%
+  ungroup()</code></pre>
+<p>Determine the proportion of surveys with “low” coral cover for the
+two methods</p>
+<pre class="r"><code>#Surveys where coral cover was below 25%
+sum(aims$LowCoral)/nrow(filter(aims, GROUP_CODE == &quot;Hard Coral&quot;))</code></pre>
+<pre><code>## [1] 0.5274576</code></pre>
+<pre class="r"><code>#Surveys where coral cover is less than algae cover
+sum(aims2$LowCoral)/nrow(filter(aims2, GROUP_CODE == &quot;Hard Coral&quot;))</code></pre>
+<pre><code>## [1] 0.8124294</code></pre>
 </div>
 </div>
 
