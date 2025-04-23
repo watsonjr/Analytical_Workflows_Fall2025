@@ -236,3 +236,27 @@ sum(aims$LowCoral)/nrow(filter(aims, GROUP_CODE == "Hard Coral"))
 sum(aims2$LowCoral)/nrow(filter(aims2, GROUP_CODE == "Hard Coral"))
 ```
 
+Another important feature of well-written code is limited redundancy. For instance, if I want to create a time series for each site within each reef, I could write separate code for 103 figures, each with 3 panels for the 3 sites.
+
+```{r}
+length(unique(aims$REEF_ID))
+```
+
+Or I could write a for-loop with a counter for reef ID. This way, I only need to modify the plot once to change it for all reefs.
+
+```{r}
+for (i in 1:length(unique(aims$REEF_ID))) {
+  reef = unique(aims$REEF_ID)[i]
+  reefPlot <- 
+    ggplot(data = filter(aims, REEF_ID == reef),
+           aes(x = YEAR, y = COVER, color = GROUP_CODE)) +
+    geom_line() +
+    scale_color_brewer(name = "Functional Group", palette = "Set2") +
+    labs(subtitle = reef) +
+    facet_wrap(~SITE_NO)
+  
+  if(i <= 10){
+    print(reefPlot)
+  }
+}
+```
