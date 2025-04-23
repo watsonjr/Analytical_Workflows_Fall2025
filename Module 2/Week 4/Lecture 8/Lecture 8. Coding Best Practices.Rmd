@@ -39,9 +39,9 @@ aims <- read.csv("../Lecture 7/ltmp_hc_sc_a_by_site_1992_2022.csv")
 
 This would look different if I had set up an R project file, **which you do should for your repositories**.
 
-**Relative filepaths are important because they will work on other computers!**
+**Relative filepaths are important because they will work on other computers! This makes your work more reproducible!**
 
-## Committing to GitHub
+## Git Commits
 
 Pushing commits to GitHub should become second nature, as comfortable to you as breathing air. You should aim to push commits to your repository immediately after any substantive changes, **but at least the same day** as you update your repository.
 
@@ -80,3 +80,117 @@ I tend to write commit messages as present-tense verb clauses with minimal punct
 -   Summarize kelp canopy cover
 
 [Here are other recommendations](https://cbea.ms/git-commit/) for writing git commit messages.
+
+## Code Formatting
+
+I tend to write my R code as R Markdown files (like this one) because it's easy to embed my code chunks in longer descriptions. The Integrated Development Environment of RStudio allows for several other features that improve code formatting.
+
+First, I can describe what each chunk is doing above in as much detail as I want. I usually write these descriptions as present-tense verb clauses, like my Git commit messages.
+
+My first chunk is usually dedicated to loading all necessary packages. It can be frustrating to make it most of the way through a long-running script only to find out that a dependency hasn't been installed.
+
+Load all packages
+
+```{r}
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+```
+
+Add a `YEAR` column and reformat `SECTOR` as a factor
+
+```{r}
+aims$YEAR <- year(aims$SAMPLE_DATE)
+aims$SECTOR <- factor(aims$SECTOR,
+                      levels = c("CG","PC","CL","CA","IN",
+                                 "TO","WH","PO","SW","CB"))
+```
+
+Second, there is a vertical line at 80 characters, which encourages the developer to not exceed this width per line of code. Good places to continue onto a new line are after commas (,), pluses (+), and pipes (%\>%). These two chunks are equivalent. But which is easier to read?
+
+Calculate the mean, standard deviation, and sample size (n) for each functional group per sector and year
+
+```{r}
+aims_summary <- aims %>% group_by(YEAR, SECTOR, GROUP_CODE) %>% summarize(mnCOVER = mean(COVER, na.rm = TRUE), sdCOVER = sd(COVER, na.rm = FALSE), nCOVER = n()) 
+```
+
+```{r}
+aims_summary <- aims %>%
+  group_by(YEAR, SECTOR, GROUP_CODE) %>%
+  summarize(mnCOVER = mean(COVER, na.rm = TRUE), #line up similar lines
+            sdCOVER = sd(COVER, na.rm = FALSE), #it helps to spot differences
+            nCOVER = n()) 
+```
+
+Third, I indent my code based on the nested nature of the operations. This can be done quickly by selecting all (Ctrl + A) and then indenting all selected (Ctrl + I).
+
+Plot the functional group covers per sector (mean +/- SE) written with no indents
+
+```{r}
+ggplot(data = aims_summary,
+aes(x = YEAR, y = mnCOVER, color = GROUP_CODE, fill = GROUP_CODE)) +
+geom_ribbon(alpha = 0.3, aes(ymin = mnCOVER-sdCOVER/sqrt(nCOVER),
+ymax = mnCOVER+sdCOVER/sqrt(nCOVER))) +
+geom_line() +
+scale_color_brewer(name = "Functional Group", palette = "Set2") +
+scale_fill_brewer(name = "Functional Group", palette = "Set2") +
+facet_wrap(~SECTOR) +
+theme_bw() +
+theme(legend.position = "top",
+axis.text = element_text(color = "black"))
+```
+
+Re-summarize the data
+
+```{r}
+aims_summary <- aims %>%
+  group_by(YEAR, SECTOR, SHELF, GROUP_CODE) %>% #what's different here?
+  summarize(mnCOVER = mean(COVER, na.rm = TRUE),
+            sdCOVER = sd(COVER, na.rm = FALSE),
+            nCOVER = n()) 
+```
+
+Plot the functional group covers per sector and shelf (mean +/- SE) written with appropriate indents
+
+```{r, fig.width=9, fig.height=12}
+ggplot(data = aims_summary,
+       aes(x = YEAR, y = mnCOVER, color = GROUP_CODE, fill = GROUP_CODE)) +
+  geom_ribbon(alpha = 0.3, aes(ymin = mnCOVER-sdCOVER/sqrt(nCOVER),
+                               ymax = mnCOVER+sdCOVER/sqrt(nCOVER))) +
+  geom_line() +
+  scale_x_continuous(name = "Year", breaks = seq(1992,2022,5)) +
+  scale_y_continuous(name = "Relative abundance (% cover)", breaks = seq(0,100,20)) +
+  scale_color_brewer(name = "Functional Group", palette = "Set2") +
+  scale_fill_brewer(name = "Functional Group", palette = "Set2") +
+  facet_grid(rows = vars(SECTOR), cols = vars(SHELF),
+             labeller = labeller(SHELF = c("I"="Inshore",
+                                           "M"="Mid-shelf",
+                                           "O"="Outer shelf"))) +
+  theme_bw() +
+  theme(legend.position = "top",
+        axis.text = element_text(color = "black"))
+```
+
+Fourth, create nested sections with headings demarcated by pound signs. You can quickly navigate to sections using the outline or drop-down menu.
+
+# \# Heading 1
+
+## \## Heading 2
+
+### \### Heading 3
+
+#### \#### Heading 4
+
+Finally, use consistent names and syntax for variables. It's also a good idea to use different naming conventions for your **stored variables** (created in R and saved to the environment) vs. your **data frame variables** (the column headers).
+
+There are five primary types of cases:
+
+-   Camel case: uses capital letters to delineate all words, except for the first word (e.g., newVariable)
+-   Pascal case: uses capital letters to delineate all words (e.g., NewVariable)
+-   Snake case: uses underscores to delineate all words (e.g., new_variable)
+-   Kebab case: uses hyphens to delineate all words (e.g., new-variable)
+-   Dot case: uses periods to delineate all words (e.g., new.variable)
+
+I typically use camel case for stored variables and Pascal case for data frame variables because they are the most concise forms (i.e., have fewer characters) and are easy to read.
+
+
