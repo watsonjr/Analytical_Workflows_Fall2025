@@ -13,8 +13,8 @@ During week 3, we'll work on the first stage of the data life cycle: create & va
 - Apply these functions and tips to an oceanographic dataset (60 min)
 
 ## Lab 3 – Thursday
-- Clean messy data about Monarch butterfly populations (60 min)
-- Generate figures and interpret findings (50 min)
+- Clean messy data about Monarch butterfly populations (90 min)
+- Generate figures and interpret findings (20+ min)
 
 Optional reading (outside of class):
 
