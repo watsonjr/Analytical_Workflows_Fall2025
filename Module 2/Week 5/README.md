@@ -2,7 +2,8 @@
 This week will be dedicated to your group projects. Please come to lecture on Monday to facilitate collaboration among your group members. Be prepared to give feedback to other groups during lab.
 
 ## Lecture 9 – Monday
-- Have check-in meetings with your group and James (80 minutes)
+- Developing the "Intellectual Infrastructure" for doing science
+- Please bring your laptops as we will be doing some in-class activities. If you can't, no worries. Pencil and paper will work.
 
 ## NO LECTURE – Wednesday
 Independent meetings with your group members
