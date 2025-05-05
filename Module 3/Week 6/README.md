@@ -2,8 +2,8 @@
 This week will focus on descriptive and confirmatory statistics and data visualization. The best way to learn these methods is to practice them, so we will emphasize applicability to your project datasets.
 
 ## Lecture 10 – Monday
-- Discuss statistical tips and tricks relevant to ecologists and environmental data scientists (40 min)
-- Select statistics, models, and other analytical methods for your projects; consult with Zech (40 min)
+- Discuss statistical tips and tricks relevant to ecologists and environmental data scientists (60 min)
+- Select statistics, models, and other analytical methods for your projects; consult with Zech (20 min)
 
 Optional reading  (outside of class):
 

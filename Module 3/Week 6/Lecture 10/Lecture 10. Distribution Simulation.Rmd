@@ -1,0 +1,206 @@
+---
+title: "Distributions"
+author: "Zechariah Meunier"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 80
+---
+
+Note, all distribution descriptions are modified from their respective Wikipedia
+pages.
+
+## Discrete Distributions
+
+### Uniform Distribution
+
+The discrete uniform distribution is a symmetric probability distribution
+wherein each of some finite whole number $n$ of outcome values are equally
+likely to be observed. Thus, every one of the $n$ outcome values has equal
+probability $1/n$. Intuitively, a discrete uniform distribution is a known,
+finite number of outcomes all equally likely to happen.
+
+Although it's supposed to be symmetric, the symmetry is actually dependent on
+the sample size. For example, when $n = 10$, it's not a very flat probability
+mass function (PMF).
+
+```{r}
+sim_uniform <- runif(n = 10, min = 0, max = 10)
+hist(sim_uniform, breaks = round(max(sim_uniform)+1))
+```
+
+Increasing `n` to 100 or 1000 improves the symmetry or flatness of the PMF.
+
+```{r}
+sim_uniform <- runif(n = 100, min = 0, max = 10)
+hist(sim_uniform, breaks = round(max(sim_uniform)+1))
+
+sim_uniform <- runif(n = 1000, min = 0, max = 10)
+hist(sim_uniform, breaks = round(max(sim_uniform)+1))
+```
+
+### Bernoulli Distribution
+
+The Bernoulli distribution, named after Swiss mathematician Jacob Bernoulli, is
+the discrete probability distribution of a random variable which takes the value
+1 with probability $p$ and the value 0 with probability $q = 1 − p$. Less
+formally, it can be thought of as a model for the set of possible outcomes of
+any single experiment that asks a yes--no question. Such questions lead to
+outcomes that are Boolean-valued: a single bit whose value is
+success/yes/true/one with probability $p$ and failure/no/false/zero with
+probability $q$. It can be used to represent a (possibly biased) coin toss where
+1 and 0 would represent "heads" and "tails", respectively, and $p$ would be the
+probability of the coin landing on heads (or vice versa where 1 would represent
+tails and $p$ would be the probability of tails). In particular, unfair coins
+would have $p ≠ 1 / 2$.
+
+The Bernoulli distribution is a special case of the binomial distribution where
+a single trial is conducted. Somewhat confusingly, the keyword argument `size`
+is the number of trials, whereas `n` is the number of observations/experiments
+(so `size` would be 1 for a Bernoulli distribution).
+
+```{r}
+sim_bernoulli <- rbinom(n = 10, size = 1, prob = 0.5)
+hist(sim_bernoulli, breaks = round(max(sim_bernoulli)+1))
+
+sim_bernoulli <- rbinom(n = 1000, size = 1, prob = 0.5)
+hist(sim_bernoulli, breaks = round(max(sim_bernoulli)+1))
+```
+
+### Binomial Distribution
+
+The binomial distribution with parameters $n$ and $p$ is the discrete
+probability distribution of the number of successes in a sequence of $n$
+independent experiments, each asking a yes--no question, and each with its own
+Boolean-valued outcome: success (with probability $p$) or failure (with
+probability $q = 1 − p$). A single success/failure experiment is also called a
+Bernoulli trial or Bernoulli experiment, and a sequence of outcomes is called a
+Bernoulli process. Again, for a single trial, the binomial distribution is a
+Bernoulli distribution.
+
+We can create a binomial distribution by modifying the above code for the
+Bernoulli distribution, increasing `size` to 10 so that the experiments consist
+of 10 trials.
+
+```{r}
+sim_binomial <- rbinom(n = 10, size = 10, prob = 0.5)
+hist(sim_binomial, breaks = round(max(sim_binomial)+1))
+
+sim_binomial <- rbinom(n = 1000, size = 10, prob = 0.5)
+hist(sim_binomial, breaks = round(max(sim_binomial)+1))
+```
+
+### Poisson Distribution
+
+The Poisson distribution is a discrete probability distribution that expresses
+the probability of a given number of events occurring in a fixed interval of
+time if these events occur with a known constant mean rate and independently of
+the time since the last event. It can also be used for the number of events in
+other types of intervals than time, and in dimension greater than 1 (e.g.,
+number of events in a given area or volume). The Poisson distribution is named
+after French mathematician Siméon Denis Poisson.
+
+The Poisson distribution has a single parameter $\lambda$ or `lambda`, which is
+the mean and the variance.
+
+```{r}
+sim_poisson <- rpois(n = 10, lambda = 10)
+hist(sim_poisson, breaks = round(max(sim_poisson)+1))
+
+sim_poisson <- rpois(n = 1000, lambda = 10)
+hist(sim_poisson, breaks = round(max(sim_poisson)+1))
+```
+
+### Negative Binomial Distribution
+
+The negative binomial distribution is a discrete probability distribution that
+models the number of failures in a sequence of independent and identically
+distributed Bernoulli trials before a specified/constant/fixed number of
+successes $r$ occur. For example, we can define rolling a 6 on some dice as a
+success, and rolling any other number as a failure, and ask how many failure
+rolls will occur before we see the third success ($r = 3$). In such a case, the
+probability distribution of the number of failures that appear will be a
+negative binomial distribution.
+
+The negative binomial distribution has two parameters $r$ or `size`, which is
+the\
+target for the number of successful trials, and $p$ or `p` which is the
+probability of success.
+
+```{r}
+sim_nbinom <- rnbinom(n = 10, size = 10, prob = 0.5)
+hist(sim_nbinom, breaks = round(max(sim_nbinom)+1))
+
+sim_nbinom <- rnbinom(n = 1000, size = 10, prob = 0.5)
+hist(sim_nbinom, breaks = round(max(sim_nbinom)+1))
+```
+
+## Continuous Distributions
+
+### Normal Distribution
+
+A normal distribution or Gaussian distribution is a type of continuous
+probability distribution for a real-valued random variable. The parameter $\mu$⁠
+is the mean or expectation of the distribution (and also its median and mode),
+while the parameter $\sigma^2$ is the variance. Normal distributions are
+important in statistics and are often used in the natural and social sciences to
+represent real-valued random variables whose distributions are not known. Their
+importance is partly due to the central limit theorem. It states that, under
+some conditions, the average of many samples (observations) of a random variable
+with finite mean and variance is itself a random variable--whose distribution
+converges to a normal distribution as the number of samples increases.
+Therefore, physical quantities that are expected to be the sum of many
+independent processes, such as measurement errors, often have distributions that
+are nearly normal.
+
+[Video on the central limit
+theorem](https://www.youtube.com/watch?v=jvoxEYmQHNM)
+
+The two parameters of the normal distribution are the mean ($\mu$) and variance
+($\sigma^2$), but you need to specify the `mean` and standard deviation `sd`
+($\sigma$). We can approximate the probability density function (PDF) using a
+histogram, but it's not perfect and the smoothness depends on the number of
+breaks.
+
+```{r}
+sim_normal <- rnorm(n = 10, mean = 1, sd = 0.5)
+hist(sim_normal, breaks = round(max(sim_normal)*10))
+
+sim_normal <- rnorm(n = 1000, mean = 1, sd = 0.5)
+hist(sim_normal, breaks = round(max(sim_normal)*20))
+
+sim_normal <- rnorm(n = 100, mean = 1, sd = 0.5)
+hist(sim_normal, breaks = round(max(sim_normal)*100))
+
+sim_normal <- rnorm(n = 10000, mean = 1, sd = 0.5)
+hist(sim_normal, breaks = round(max(sim_normal)*200))
+```
+
+### Gamma Distribution
+
+The gamma distribution is a versatile two-parameter family of continuous
+probability distributions. There are two equivalent parameterizations in common
+use:
+
+1.  With a shape parameter $\alpha$ and a scale parameter $\theta$
+2.  With a shape parameter $\alpha$ and a rate parameter $\lambda =1/\theta$
+
+In each of these forms, both parameters are positive real numbers. The gamma
+distribution is integral to modeling a range of phenomena due to its flexible
+shape, which can capture various statistical distributions, including the
+exponential and chi-squared distributions under specific conditions.
+
+```{r}
+sim_gamma <- rgamma(n = 100, shape = 1, rate = 2)
+hist(sim_gamma, breaks = round(max(sim_gamma)*100))
+
+sim_gamma <- rgamma(n = 10000, shape = 1, rate = 2)
+hist(sim_gamma, breaks = round(max(sim_gamma)*100))
+
+sim_gamma <- rgamma(n = 100, shape = 1, scale = 0.5)
+hist(sim_gamma, breaks = round(max(sim_gamma)*200))
+
+sim_gamma <- rgamma(n = 10000, shape = 1, scale = 0.5)
+hist(sim_gamma, breaks = round(max(sim_gamma)*200))
+```
