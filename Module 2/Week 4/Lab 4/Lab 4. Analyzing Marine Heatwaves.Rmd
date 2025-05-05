@@ -1,0 +1,234 @@
+---
+title: "Lab 4: Analyzing Marine Heatwaves"
+author: "YOUR NAME HERE"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Background & Objectives
+
+In today's lab, you will be analyzing temperature data from the Great Barrier Reef (GBR) in Australia. These data are from the Agincourt Reef Automated Marine Weather and Oceanographic Station, which is located in the northern GBR. Corals living in the GBR have experienced several mass bleaching events in 2016, 2017, 2020, 2022, and 2024 (Henley et al. 2024). Bleaching occurs when corals expel their symbiotic dinoflagellates, which normally live in their tissues and provide photosynthetic energy to the corals. Without the algae, corals exhibit white calcium carbonate skeletons, hence the "bleaching" term. While bleaching has been linked to low salinity, cold waters, or nutrient pollution, it is generally associated with extremely warm water temperatures. We are aiming to detect marine heatwaves (MHWs) in these temperature time series to answer three research questions:
+
+1)  Did the Agincourt Reef experience a marine heatwave during the five recent mass bleaching events?
+
+2)  How did water depth affect the occurrence and severity of marine heatwaves?
+
+3)  How do operational definitions of marine heatwaves affect their detection?
+
+# Data Exploration
+
+Load libraries `heatwaveR`, `tidyverse` (which contains the classics `dplyr`, `tidyr`, and `ggplot2`), and `lubridate`.
+
+```{r, echo=FALSE}
+library(heatwaveR)
+library(tidyverse)
+library(lubridate)
+```
+
+Load data from sensors at depths of 2.5 m, 10 m, and 12 m as three separate data frames.
+
+```{r}
+Agincourt2.5 <- read.csv("Agincourt Reef Weather Station Water Temperature @2.5m from 2013-03-20 to 2023-07-20.csv")
+
+Agincourt10 <- read.csv("Agincourt Reef Weather Station Water Temperature @10m from 1991-02-22 to 2010-09-18.csv")
+
+Agincourt12 <- read.csv("Agincourt Reef Weather Station Water Temperature @12m from 2013-03-20 to 2024-12-19.csv")
+```
+
+Determine the column that contains the frequency of temperature observations. How does this vary across the three data frames?
+
+```{r}
+unique(Agincourt2.5$sampling_interval_seconds)
+unique(Agincourt10$sampling_interval_seconds)
+unique(Agincourt12$sampling_interval_seconds)
+```
+
+The `heatwaveR` package utilizes dates, but there isn't a date column yet. Make one for each data frame.
+
+```{r}
+Agincourt2.5$date <- date(Agincourt2.5$time)
+Agincourt10$date <- date(Agincourt10$time)
+Agincourt12$date <- date(Agincourt12$time)
+```
+
+What are the minimum and maximum temperatures for each depth? Do these seem reasonable?
+
+```{r}
+min(Agincourt2.5$raw_value)
+max(Agincourt2.5$raw_value)
+min(Agincourt10$raw_value)
+max(Agincourt10$raw_value)
+min(Agincourt12$raw_value)
+max(Agincourt12$raw_value)
+```
+
+# Data Processing
+
+How many quality control (QC) flag values are there? What is the breakdown for each data frame? Use the function `table` to check the `qc_flag` column.
+
+```{r}
+table(Agincourt2.5$qc_flag)
+table(Agincourt10$qc_flag)
+table(Agincourt12$qc_flag)
+```
+
+Let's keep only the "Good" and "Probably Good" temperatures in each data frame using a `filter` function.
+
+```{r}
+Agincourt2.5_qc <- filter(Agincourt2.5, qc_flag %in% c("Good","Probably Good"))
+Agincourt10_qc <- filter(Agincourt10, qc_flag %in% c("Good","Probably Good"))
+Agincourt12_qc <- filter(Agincourt12, qc_flag %in% c("Good","Probably Good"))
+```
+
+The `heatwaveR` package expects daily temperatures, so for each data frame, calculate daily mean temperatures using `group_by` and `summarize`. The only variables remaining in your new data frame should be date and mean temperature.
+
+```{r}
+A2.5_summary <- Agincourt2.5_qc %>%
+  group_by(date) %>%
+  summarize(mnTemp = mean(raw_value, na.rm = T))
+
+A10_summary <- Agincourt10_qc %>%
+  group_by(date) %>%
+  summarize(mnTemp = mean(raw_value, na.rm = T))
+
+A12_summary <- Agincourt12_qc %>%
+  group_by(date) %>%
+  summarize(mnTemp = mean(raw_value, na.rm = T))
+```
+
+Let's look at the time series in separate plots by depth. We will standardize the y-axis to compare plots.
+
+```{r}
+ggplot(data = A2.5_summary, aes(x=date, y=mnTemp)) +
+  geom_line(color = "skyblue") +
+  scale_y_continuous(name = bquote("Daily Mean Temperature ("*degree*"C)"),
+                     breaks = seq(22,32,2), limits = c(22,33)) +
+  labs(subtitle = "Depth 2.5 m") +
+  theme_classic()
+
+ggplot(data = A10_summary, aes(x=date, y=mnTemp)) +
+  geom_line(color = "dodgerblue") +
+  scale_y_continuous(name = bquote("Daily Mean Temperature ("*degree*"C)"),
+                     breaks = seq(22,32,2), limits = c(22,33)) +
+  labs(subtitle = "Depth 10 m") +
+  theme_classic()
+
+ggplot(data = A12_summary, aes(x=date, y=mnTemp)) +
+  geom_line(color = "dodgerblue4") +
+  scale_y_continuous(name = bquote("Daily Mean Temperature ("*degree*"C)"),
+                     breaks = seq(22,32,2), limits = c(22,33)) +
+  labs(subtitle = "Depth 12 m") +
+  theme_classic()
+```
+
+Do you notice any unusual extreme temperatures? These should be removed because they are probably erroneous and will affect the calculation of the baseline climatology. Use the `filter` function to remove any temperatures above $32 ^\circ$C and below $22.5 ^\circ$C for each data frame.
+
+```{r}
+A2.5_summary_qc <- filter(A2.5_summary, 22.5 < mnTemp & mnTemp < 32)
+A10_summary_qc <- filter(A10_summary, 22.5 < mnTemp & mnTemp < 32)
+A12_summary_qc <- filter(A12_summary, 22.5 < mnTemp & mnTemp < 32)
+```
+
+Now that we have our quality controlled temperature data, determine the starting and ending dates available for each time series. Save these as variables for later use.
+
+```{r}
+srt2.5 <- min(A2.5_summary_qc$date)
+end2.5 <- max(A2.5_summary_qc$date)
+srt10 <- min(A10_summary_qc$date)
+end10 <- max(A10_summary_qc$date)
+srt12 <- min(A12_summary_qc$date)
+end12 <- max(A12_summary_qc$date)
+```
+
+# MHW Detection
+
+Now we're finally ready to detect marine heatwaves using `heatwaveR`! There are three main steps:
+
+1.  Calculate the climatology, which is the smoothed mean temperature for a given day of the year (doy).
+
+2.  Determine the 90% threshold above the climatology, which must be exceeded by a warming event for it to qualify as a MHW.
+
+3.  Compare the daily mean temperature to the threshold to detect MHWs.
+
+The first two steps can be accomplished using the `ts2clm` function to create a climatology from a time series. Read the help text for more information by typing `?ts2clm` and then apply the function to each data frame. Save the climatologies as new data frames.
+
+```{r}
+A2.5_clim <- ts2clm(data = A2.5_summary_qc, x = date, y = mnTemp,
+                   climatologyPeriod = c(srt2.5, end2.5))
+A10_clim <- ts2clm(data = A10_summary_qc, x = date, y = mnTemp,
+                   climatologyPeriod = c(srt10, end10))
+A12_clim <- ts2clm(data = A12_summary_qc, x = date, y = mnTemp,
+                   climatologyPeriod = c(srt12, end12))
+```
+
+Now use the `detect_event` function to accomplish the third step. Again, type `?detect_event` and review the help text to apply it to each climatology data frame. Save the MHW events as new data frames.
+
+```{r}
+A2.5_MHW <- detect_event(data = A2.5_clim, x = date, y = mnTemp)
+A10_MHW <- detect_event(data = A10_clim, x = date, y = mnTemp)
+A12_MHW <- detect_event(data = A12_clim, x = date, y = mnTemp)
+```
+
+Lastly, we can visualize the MHWs on Agincourt Reef using the `event_line` function, which creates a time series plot showing the temperature as a black line with red fills during MHW events. Adjust the keyword arguments `spread` to view larger or smaller windows of time and `category` to see the four categories of MHWs: moderate, strong, severe, and extreme.
+
+```{r}
+#Reef at 2.5 m
+event_line(data = A2.5_MHW, x = date, y = mnTemp,
+           spread = 1000, category = FALSE)
+event_line(data = A2.5_MHW, x = date, y = mnTemp,
+           spread = 250, category = TRUE)
+
+#Reef at 10 m
+event_line(data = A10_MHW, x = date, y = mnTemp,
+           spread = 1000, category = FALSE)
+event_line(data = A10_MHW, x = date, y = mnTemp,
+           spread = 250, category = TRUE)
+
+#Reef at 12 m
+event_line(data = A12_MHW, x = date, y = mnTemp,
+           spread = 1000, category = FALSE)
+event_line(data = A12_MHW, x = date, y = mnTemp,
+           spread = 250, category = TRUE)
+```
+
+Let's revisit our research questions:
+
+1.  Did the Agincourt Reef experience a marine heatwave during the five recent mass bleaching events (2016, 2017, 2020, 2022, and 2024)?
+
+Use the time series from 12 m depth to answer this question because it spans these years. You could make five separate figures with different `start_date` and `end_date` arguments in the `event_line` function, or you could write a for-loop to generate them with a single click :)
+
+```{r}
+for (y in 1:5) {
+  year = c(2016, 2017, 2020, 2022, 2024)[y]
+  
+  MHW_graph <- event_line(data = A12_MHW, x = date, y = mnTemp,
+                          start_date = as.Date(paste0(year,"-01-01")),
+                          end_date = as.Date(paste0(year,"-12-31")))
+  
+  print(MHW_graph)
+}
+```
+
+YOUR ANSWER HERE
+
+2.  How did water depth affect the occurrence and severity of marine heatwaves?
+
+Take a closer look at the time series plots you generated earlier. No need to create a new set of graphs.
+
+YOUR ANSWER HERE
+
+3.  How do operational definitions of marine heatwaves affect their detection?
+
+Think about how you would run a de-trended analysis to separate long-term (chronic) ocean warming from abrupt (acute) marine heatwaves. Reflect on Farchadi et al. 2025 in answering this question.
+
+YOUR ANSWER HERE
+
+# Discussion
+
+**Grad students only**
+
+# References
+
+**Grad students only**
