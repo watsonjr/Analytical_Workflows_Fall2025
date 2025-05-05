@@ -1,10 +1,10 @@
 # Week 7
 
 
-## Lecture 13 – Monday
+## Lecture 12 – Monday
 
 
-## Lecture 14 – Wednesday
+## Lecture 13 – Wednesday
 
 
 ## Lab 7 – Thursday

@@ -1,10 +1,10 @@
 # Week 8
 
 
-## Lecture 15 – Monday
+## Lecture 14 – Monday
 
 
-## Lecture 16 – Wednesday
+## Lecture 15 – Wednesday
 
 
 ## Lab 8 – Thursday
