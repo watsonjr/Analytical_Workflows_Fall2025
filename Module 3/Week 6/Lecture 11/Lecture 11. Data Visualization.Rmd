@@ -1,0 +1,167 @@
+---
+title: "Lecture 11. Data Visualization"
+author: "Zechariah Meunier"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Data Tables
+
+### Purpose
+
+Data tables show specific values of qualitative and quantitative data and can be used in many situations:
+
+-   You want readers to look up exact values (e.g., measurements, statistics, coefficients).
+
+-   The data are not easily visualized (e.g., model parameters, categorical comparisons with many groups).
+
+-   You need to report summary statistics (e.g., means, standard errors, p-values) that support a result described in the text.
+
+-   The goal is to compare exact numbers across rows or columns (e.g., species counts).
+
+### Design Principles
+
+The caption goes above the data table and the word table is never abbreviated. I prefer having the table title bold and separated from the rest of the caption with a period.
+
+The header row is often separated from the caption and other rows with horizontal lines. Occasionally, the header row is in boldface font.
+
+If a column contains qualitative data, it is left-aligned. If it contains quantitative data, it is center-aligned. The units of the quantitative data are given in parentheses after the variable name.
+
+**Table 1**. Example table showing appropriate formatting.
+
+| Country                  | Population size (millions) | Official language |
+|--------------------------|:--------------------------:|-------------------|
+| United States of America |           340.1            | English\*         |
+| Mexico                   |           129.7            | None              |
+| Canada                   |            40.1            | English, French   |
+
+: \*Designated in EO 14224 on March 1, 2025
+
+## Figures
+
+### Purpose
+
+Figures show representations of qualitative and quantitative data and can be used in many situations:
+
+-   The main goal is to reveal patterns, trends, or relationships in the data.
+
+-   You're comparing distributions, time series, spatial patterns, or model fits.
+
+-    Visual presentation makes the results more intuitive or immediately interpretable.
+
+-    You want to highlight differences, correlations, or interactions.
+
+-    The audience benefits from a visual summary over raw numbers.
+
+### Design Principles
+
+## Madison Area Lakes Example
+
+Load libraries
+
+```{r}
+library(tidyverse)
+```
+
+Load dataset
+
+```{r}
+meteorology <- read.csv("Madison Daily Meteorological Data.csv")
+biomass <- read.csv("Madison Lakes Area Macrophyte Biomass.csv")
+rating <- read.csv("Madison Lakes Area Macrophyte Rating.csv")
+```
+
+Store lake as a factor, add labels for lake and depth
+
+```{r}
+biomass$lakeid <- factor(biomass$lakeid,
+                         levels = c("FI","ME","MO","WI"))
+
+rating$lakeid <- factor(rating$lakeid,
+                        levels = c("FI","ME","MO","WI"))
+
+lakelabels <- c("FI" = "Fish Lake",
+                "ME" = "Lake Mendota",
+                "MO" = "Lake Monona",
+                "WI" = "Lake Wingra")
+
+depthlabels <- c("1" = "1 m", "1.5" = "1.5 m",
+                 "2" = "2 m", "2.5" = "2.5 m",
+                 "3" = "3 m", "3.5" = "3.5 m")
+```
+
+Check to see how well-represented each depth is in each lake
+
+```{r}
+table(biomass$depth, biomass$lakeid)
+```
+
+Create theme and color scheme
+
+```{r}
+plantcolors <- c("darkolivegreen3","darkgreen")
+
+plottheme <- theme(axis.title = element_text(size = 10, color = "black"),
+                   axis.text = element_text(size = 8, color ="black"),
+                   axis.ticks = element_line(color = "black"),
+                   panel.background = element_blank(),
+                   panel.border = element_rect(fill = NA, color = "black"),
+                   legend.key = element_blank(), 
+                   legend.position = "top",
+                   legend.box.spacing = unit(0.1,"cm"),
+                   legend.title = element_text(size = 10, color = "black"),
+                   legend.text = element_text(size = 9, color = "black"))
+```
+
+Create a time series of biomass:
+
+-   x-axis: time
+-   y-axis: biomass
+-   colors: macrophyte group
+-   rows: depth
+-   columns: lakes
+
+```{r}
+ggplot(data = filter(biomass, !depth %in% c(3.3, 4, 4.5))) +
+  #95% confidence intervals
+  stat_summary(aes(x = year4, y = fil_algae_wt), fill = plantcolors[1],
+               fun.data = "mean_cl_boot", geom = "ribbon", alpha = 0.5) +
+  stat_summary(aes(x = year4, y = plant_wt_hand), fill = plantcolors[2],
+               fun.data = "mean_cl_boot", geom = "ribbon", alpha = 0.5) +
+  #means
+  stat_summary(aes(x = year4, y = fil_algae_wt), color = plantcolors[1],
+               fun = "mean", geom = "line") +
+  stat_summary(aes(x = year4, y = plant_wt_hand), color = plantcolors[2],
+               fun = "mean", geom = "line") +
+  #design elements
+  facet_grid(rows = vars(depth), cols = vars(lakeid)) +
+  plottheme
+```
+
+Refine the plot by improving the labels, axis breaks, and adding a legend
+
+```{r}
+ggplot(data = filter(biomass, !depth %in% c(3.3, 4, 4.5))) +
+  #95% confidence intervals
+  stat_summary(aes(x = year4, y = fil_algae_wt/1000), fill = plantcolors[1],
+               fun.data = "mean_cl_boot", geom = "ribbon", alpha = 0.5) +
+  stat_summary(aes(x = year4, y = plant_wt_hand/1000), fill = plantcolors[2],
+               fun.data = "mean_cl_boot", geom = "ribbon", alpha = 0.5) +
+  #means
+  stat_summary(aes(x = year4, y = fil_algae_wt/1000, color = "1"),
+               fun = "mean", geom = "line") +
+  stat_summary(aes(x = year4, y = plant_wt_hand/1000, color = "2"),
+               fun = "mean", geom = "line") +
+  #design elements
+  facet_grid(rows = vars(depth), cols = vars(lakeid),
+             labeller = labeller(lakeid = lakelabels, depth = depthlabels)) +
+  plottheme +
+  scale_x_continuous(name = "Year", breaks = seq(1995,2025,5)) +
+  scale_y_continuous(name = "Biomass (kg)") +
+  scale_color_manual(name = "Macrophtye", values = plantcolors,
+                     labels = c("Filamentous algae","Aquatic plant")) +
+  theme(axis.text.x = element_text(color ="black", angle = 90, vjust = 0.5))
+
+ggsave("Figures/Biomass Time Series.png", dpi = 1200,
+       width = 8, height = 6, units = "in")
+```
