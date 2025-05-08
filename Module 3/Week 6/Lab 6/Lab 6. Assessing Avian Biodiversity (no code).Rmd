@@ -1,0 +1,154 @@
+---
+title: "Lab 6. Assessing Avian Biodiversity in HJ Andrews Experimental Forest"
+author: "YOUR NAME HERE"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Background & Objectives
+
+The HJ Andrews Experimental Forest, located in the western Cascade Range of Oregon, is a renowned Long-Term Ecological Research (LTER) site established to study forest and stream ecosystems. Spanning over 16,000 acres, the forest represents a mosaic of old-growth, mature, and regenerating stands, offering a critical window into ecological processes, climate change impacts, and biodiversity patterns over time.
+
+Biodiversity monitoring at HJ Andrews employs many different methods. We will use point count surveys of birds, where observers detect species with visual or auditory cues. We will then calculate alpha ($\alpha$), beta ($\beta$), and gamma ($\gamma$) diversity to understand species richness and distribution across spatial and temporal scales. Alpha diversity refers to the species richness within a specific plot or habitat, providing insights into local communities. Gamma diversity captures the total species richness across the entire forest landscape, reflecting regional biodiversity. Beta diversity quantifies the variation in species composition among plots, shedding light on ecological differentiation, habitat heterogeneity, and community turnover.
+
+These metrics are vital for detecting shifts in species distributions driven by disturbances such as wildfire, logging, and climate change. Long-term biodiversity monitoring at HJ Andrews enables researchers to assess resilience, track successional changes, and inform conservation strategies in the face of environmental change, making it a cornerstone for ecological research in the Pacific Northwest.
+
+# Data Processing
+
+Load the `tidyverse` libraries.
+
+```{r}
+
+```
+
+Load the two data sets.
+
+```{r}
+
+```
+
+Now that we've loaded the data, let's look at the spatial information contained in `PLOT` as well as the temporal information contained in `YEAR` and `REPLICATE`. How many plots, years, and replicates are there?
+
+```{r}
+
+```
+
+In what months were the replicate surveys conducted?
+
+```{r}
+
+```
+
+Determine how many species are present using the `unique` function.
+
+```{r}
+
+```
+
+These four-letter abbreviations are the alpha codes, usually comprised of the first letter or two from each word in a bird's common name (e.g., HEWA is hermit warbler, AMDI is American dipper). We want to understand what species are present, so find a publicly available data set with the alpha codes and common names, then perform a join operation to add a new column for species common name.
+
+```{r}
+
+```
+
+Of course, bird names are tricky because taxonomy is constantly changing, so determine which bird codes still don't have common names.
+
+```{r}
+
+```
+
+Some of these are unknown or unidentified species (beginning with "UN"), some are alternate names or renamed birds. For example, PSFL is now the Western Flycatcher, formerly the [Pacific-slope Flycatcher](https://www.allaboutbirds.org/guide/Western_Flycatcher/overview), and originally the Western Flycatcher (bird names, man). But some of them are smammals (small mammals) that do not belong in our avian biodiversity study! Remove the small mammals and unknown/unidentified species, then add in common names for any known species that are still missing them. Be careful not to overwrite your common name data from above!
+
+```{r}
+
+```
+
+At this stage, your data set should have 77 species with positive identifications. Double-check that this is the case.
+
+```{r}
+
+```
+
+# Biodiversity Monitoring
+
+Our goal is to determine the $\alpha$, $\beta$, and $\gamma$ diversities of our spatial locations per year. We will use the following spatial clustering:
+
+-   $\alpha$ diversity at the plot-level
+-   $\gamma$ diversity at the landscape-level (entire forest)
+-   $\beta$ diversity as their ratio ($\frac{\gamma}{\bar\alpha}$), as Whittaker intended
+
+We will use species richness (i.e., the number of species present per unit area) as our diversity index. Let's calculate how many bird species are present in each year ($\gamma$ diversity) or year and plot ($\alpha$ diversity), ignoring their number of detections (an estimate of abundance).
+
+```{r}
+
+```
+
+Now calculate the $\beta$ diversity as the ratio. Be sure to determine the average $\alpha$ diversity across plots first!
+
+```{r}
+
+```
+
+Let's apply the principles of data visualization that we learned this week to create informative plots for our new avian diversity data.
+
+The first plot will display the $\bar\alpha$, $\beta$, and $\gamma$ diversities for the entire HJ Andrews Experimental Forest. One panel with the following:
+
+-   x-axis: year
+-   y-axis: species richness
+-   colors: diversity index
+
+```{r}
+
+```
+
+Why does the beta diversity increase when the alpha and gamma diversities both decrease?
+
+YOUR EXPLANATION HERE
+
+For our next plot, let's revisit the data set and determine the number of new detections of:
+
+- two vulnerable species, Evening Grosbeak (EVGR) and Northern Spotted Owl (NSOW)
+- two common species, Pacific Wren (PAWR) and Steller's Jay (STJA)
+- two irruptive (unpredictably migratory) species, Red Crossbill (RECR) and Pine Siskin (PISI)
+
+Filter based on these species and the new record flag.
+
+```{r}
+
+```
+
+Now determine how many new detections of these species occurred per year, plot, and replicate. We can assume that these new detections represent unique individuals per survey.
+
+```{r}
+
+```
+
+Next create a figure showing how many times each species was detected across all plots and replicates. Generate four panels with the following:
+
+- x-axis: Year
+- y-axis: Total detections (make the breaks flexible per axis)
+- columns: Species
+
+```{r}
+
+```
+
+What could have occurred in 2015 and 2020 that affected common, rare, and irruptive species?
+
+YOUR ANSWER HERE
+
+Finally, plot a histogram of the detections of your favorite species. What distribution would you use to model the number of birds detected?
+
+```{r}
+
+```
+
+YOUR ANSWER HERE
+
+# Discussion
+
+**Grad students only**
+
+# References
+
+**Grad students only**
