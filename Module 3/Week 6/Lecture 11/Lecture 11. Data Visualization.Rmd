@@ -21,7 +21,7 @@ Data tables show specific values of qualitative and quantitative data and can be
 
 ### Design Principles
 
-The caption goes above the data table and the word table is never abbreviated. I prefer having the table title bold and separated from the rest of the caption with a period.
+The caption goes above the data table and the word "table" is never abbreviated. I prefer having the table title bold and separated from the rest of the caption with a period.
 
 The header row is often separated from the caption and other rows with horizontal lines. Occasionally, the header row is in boldface font.
 
@@ -35,7 +35,7 @@ If a column contains qualitative data, it is left-aligned. If it contains quanti
 | Mexico                   |           129.7            | None              |
 | Canada                   |            40.1            | English, French   |
 
-: \*Designated in EO 14224 on March 1, 2025
+\*Designated in EO 14224 on March 1, 2025
 
 ## Figures
 
@@ -47,28 +47,123 @@ Figures show representations of qualitative and quantitative data and can be use
 
 -   You're comparing distributions, time series, spatial patterns, or model fits.
 
--    Visual presentation makes the results more intuitive or immediately interpretable.
+-   Visual presentation makes the results more intuitive or immediately interpretable.
 
--    You want to highlight differences, correlations, or interactions.
+-   You want to highlight differences, correlations, or interactions.
 
--    The audience benefits from a visual summary over raw numbers.
+-   The audience benefits from a visual summary over raw numbers.
 
 ### Design Principles
 
-## Madison Area Lakes Example
+The caption goes below the figure and the word "figure(s)" is abbreviated "Fig(s)." for in-text citations. As before, I prefer having the figure title bold and separated from the rest of the caption with a period.
 
-Load libraries
+For two-dimensional figures, there are five primary elements with which to display data:
+
+-   x-axis: usually reserved for the explanatory variable or time
+-   y-axis: usually reserved for the response variable
+-   color/shape/line scheme: denoting levels of a factor
+    -   strive for no more than 4 line types, 6 shapes, or 10 colors
+-   rows: denoting levels of a factor, where top-bottom order may be meaningful
+-   columns: denoting levels of a factor, where left-right order may be meaningful
+
+**Note on color schemes:** Colors should be logical, meaningful, and distinct for people with all vision abilities (i.e., use colorblind-friendly palettes whenever possible).
+
+## Palmer Antarctica LTER Example
+
+This week, we will be working with several data sets from three Long Term Ecological Research (LTER) sites. The first is in Antarctica and includes data on charismatic penguins.
+
+Consider some factors that might influence penguin size. For example, imagine I'm interested in assessing how penguin body mass changes by species, year, and island. I have four variables of interest:
+
+-   body mass (quantitative response)
+-   year (ordinal explanatory)
+-   island (nominal explanatory)
+-   species (nominal explanatory)
+
+Which variables should be displayed on which elements?
+
+```{r}
+head(penguins)
+```
+
+Let's make a quick plot showing these four variables.
 
 ```{r}
 library(tidyverse)
+
+ggplot(data = penguins,
+       aes(x = year, y = body_mass, color = species)) +
+  geom_point() +
+  facet_wrap(~island)
 ```
+
+The default ggplot settings aren't great, so we will adjust some of the design elements. First, we'll convert the `year` variable to a factor and adjust the title. We'll also improve the titles for the y-axis and legend, and change the color scheme to a colorblind-friendly palette.
+
+```{r}
+ggplot(data = penguins,
+       aes(x = factor(year), y = body_mass, color = species)) +
+  geom_point() +
+  facet_wrap(~island) +
+  scale_x_discrete(name = "Year") +
+  scale_y_continuous(name = "Body mass (g)") +
+  scale_color_brewer(name = "Species", palette = "Dark2")
+```
+
+Now we want to improve the theme with a mix of pre-built and custom settings.
+
+```{r}
+ggplot(data = penguins,
+       aes(x = factor(year), y = body_mass, color = species)) +
+  geom_point() +
+  scale_x_discrete(name = "Year") +
+  scale_y_continuous(name = "Body mass (g)") +
+  scale_color_brewer(name = "Species", palette = "Dark2") +
+  facet_wrap(~island) +
+  theme_bw() +
+  theme(legend.position = "top",
+        axis.text = element_text(color = "black"),
+        axis.ticks = element_line(color = "black"))
+```
+
+Next we want to jitter the points and make them partially transparent so that we can see more details.
+
+```{r}
+ggplot(data = penguins,
+       aes(x = factor(year), y = body_mass, color = species)) +
+  geom_jitter(width = 0.2, height = 0, size = 1.5, alpha = 0.6) +
+  scale_x_discrete(name = "Year") +
+  scale_y_continuous(name = "Body mass (g)") +
+  scale_color_brewer(name = "Species", palette = "Dark2") +
+  facet_wrap(~island) +
+  theme_bw() +
+  theme(legend.position = "top",
+        axis.text = element_text(color = "black"),
+        axis.ticks = element_line(color = "black"))
+```
+
+Finally, we want to add mean body mass in addition to the raw data using the `stat_summary` function.
+
+```{r}
+ggplot(data = penguins,
+       aes(x = factor(year), y = body_mass, color = species)) +
+  stat_summary(fun = "mean", geom = "point", show.legend = FALSE,
+               size = 5, shape = 18, alpha = 0.6) +
+  geom_jitter(width = 0.2, height = 0, size = 1.5, alpha = 0.6) +
+  scale_x_discrete(name = "Year") +
+  scale_y_continuous(name = "Body mass (g)") +
+  scale_color_brewer(name = "Species", palette = "Dark2") +
+  facet_wrap(~island) +
+  theme_bw() +
+  theme(legend.position = "top",
+        axis.text = element_text(color = "black"),
+        axis.ticks = element_line(color = "black"))
+```
+
+## North Temperate Lakes LTER Example
 
 Load dataset
 
 ```{r}
-meteorology <- read.csv("Madison Daily Meteorological Data.csv")
 biomass <- read.csv("Madison Lakes Area Macrophyte Biomass.csv")
-rating <- read.csv("Madison Lakes Area Macrophyte Rating.csv")
 ```
 
 Store lake as a factor, add labels for lake and depth
@@ -76,9 +171,6 @@ Store lake as a factor, add labels for lake and depth
 ```{r}
 biomass$lakeid <- factor(biomass$lakeid,
                          levels = c("FI","ME","MO","WI"))
-
-rating$lakeid <- factor(rating$lakeid,
-                        levels = c("FI","ME","MO","WI"))
 
 lakelabels <- c("FI" = "Fish Lake",
                 "ME" = "Lake Mendota",
