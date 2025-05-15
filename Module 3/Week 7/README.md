@@ -7,5 +7,12 @@ Introduction to Vibe Coding with LLMs. Introduction to timeseries analysis. Diff
 ## Lecture 13 – Wednesday
 Non-linear ecosystem dynamics again, hysteresis, early warning signals, critical slowing down, bifurcations. Spatio-temporal data structures, pairwise correlation matrixes (the most beautiful objects in the universe), dimensional reduction using Principal Components Analysis (PCA).
 
+## Papers to read:
+https://www.nature.com/articles/nature06252
+
+https://www.cell.com/trends/ecology-evolution/abstract/S0169-5347(03)00278-7?large_figure=true
+
+https://www.nature.com/articles/nature08227
+
 ## Lab 7 – Thursday
 Map the top three eigenvectors (principal components) of the pairwise correlation matrix for sea surface temperature timeseries measured at multiple locations in the North Pacific. Use an LLM to aid in the analysis.
