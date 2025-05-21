@@ -18,55 +18,72 @@ These metrics are vital for detecting shifts in species distributions driven by 
 Load the `tidyverse` libraries.
 
 ```{r}
-
+library(tidyverse)
 ```
 
 Load the two data sets.
 
 ```{r}
-
+bird_obs <- read.csv("Individual bird observations.csv")
+surveys <- read.csv("Point count survey information.csv")
 ```
 
 Now that we've loaded the data, let's look at the spatial information contained in `PLOT` as well as the temporal information contained in `YEAR` and `REPLICATE`. How many plots, years, and replicates are there?
 
 ```{r}
-
+print("Number of plots:")
+length(unique(bird_obs$PLOT))
+print("Number of years:")
+length(unique(bird_obs$YEAR))
+print("Number of replicates:")
+length(unique(bird_obs$REPLICATE))
 ```
 
 In what months were the replicate surveys conducted?
 
 ```{r}
-
+table(surveys$REPLICATE, month(surveys$SURVEY_DATETIME))
 ```
 
 Determine how many species are present using the `unique` function.
 
 ```{r}
-
+sort(unique(bird_obs$SPECIES))
 ```
 
 These four-letter abbreviations are the alpha codes, usually comprised of the first letter or two from each word in a bird's common name (e.g., HEWA is hermit warbler, AMDI is American dipper). We want to understand what species are present, so find a publicly available data set with the alpha codes and common names, then perform a join operation to add a new column for species common name.
 
 ```{r}
+codes <- read.csv("IBP-AOS-LIST24.csv") %>%
+  select(SPEC, COMMONNAME)
 
+bird_obs2 <- left_join(bird_obs, codes, by = c("SPECIES" = "SPEC"))
 ```
 
 Of course, bird names are tricky because taxonomy is constantly changing, so determine which bird codes still don't have common names.
 
 ```{r}
-
+missing <- filter(bird_obs2, is.na(COMMONNAME))
+unique(missing$SPECIES)
 ```
 
 Some of these are unknown or unidentified species (beginning with "UN"), some are alternate names or renamed birds. For example, PSFL is now the Western Flycatcher, formerly the [Pacific-slope Flycatcher](https://www.allaboutbirds.org/guide/Western_Flycatcher/overview), and originally the Western Flycatcher (bird names, man). But some of them are smammals (small mammals) that do not belong in our avian biodiversity study! Remove the small mammals and unknown/unidentified species, then add in common names for any known species that are still missing them. Be careful not to overwrite your common name data from above!
 
 ```{r}
-
+bird_obs2 <- bird_obs2 %>%
+  #remove chipmunk, Douglas squirrel, pika, and unknown/unidentified birds
+  filter(!SPECIES %in% c("CHIP", "DOSQ", "PIKA"),
+         !str_starts(SPECIES, "UN")) %>%
+  mutate(COMMONNAME = case_match(SPECIES,
+                                 "PSFL" ~ "Western Flycatcher",
+                                 "BADO" ~ "Barred Owl",
+                                 .default = COMMONNAME))
 ```
 
 At this stage, your data set should have 77 species with positive identifications. Double-check that this is the case.
 
 ```{r}
-
+length(unique(bird_obs2$COMMONNAME))
 ```
 
 # Biodiversity Monitoring
@@ -80,13 +97,25 @@ Our goal is to determine the $\alpha$, $\beta$, and $\gamma$ diversities of our 
 We will use species richness (i.e., the number of species present per unit area) as our diversity index. Let's calculate how many bird species are present in each year ($\gamma$ diversity) or year and plot ($\alpha$ diversity), ignoring their number of detections (an estimate of abundance).
 
 ```{r}
+bird_richness_alpha <- bird_obs2 %>%
+  group_by(YEAR, PLOT) %>%
+  summarize(ALPHA = length(unique(COMMONNAME)))
 
+bird_richness_gamma <- bird_obs2 %>%
+  group_by(YEAR) %>%
+  summarize(GAMMA = length(unique(COMMONNAME)))
 ```
 
 Now calculate the $\beta$ diversity as the ratio. Be sure to determine the average $\alpha$ diversity across plots first!
 
 ```{r}
+bird_richness_alpha_avg <- bird_richness_alpha %>%
+  group_by(YEAR) %>%
+  summarize(mnALPHA = mean(ALPHA), .groups = "drop")
 
+bird_richness <- bird_richness_gamma %>%
+  left_join(bird_richness_alpha_avg, by = "YEAR") %>%
+  mutate(BETA = GAMMA/mnALPHA)
 ```
 
 Let's apply the principles of data visualization that we learned this week to create informative plots for our new avian diversity data.
@@ -98,7 +127,21 @@ The first plot will display the $\bar\alpha$, $\beta$, and $\gamma$ diversities 
 -   colors: diversity index
 
 ```{r}
+divlabels <- c(bquote(bar(alpha)~"(plot)"),
+               bquote(beta),
+               bquote(gamma~"(forest)"))
 
+ggplot(data = bird_richness, aes(x = YEAR)) +
+  geom_line(aes(y = mnALPHA, color = "1")) +
+  geom_line(aes(y = BETA, color = "2")) +
+  geom_line(aes(y = GAMMA, color = "3")) +
+  scale_x_continuous(name = "Year",
+                     breaks = seq(2009, 2023, 2)) +
+  scale_y_continuous(name = "Species richness (no. of spp.)",
+                     breaks = seq(0,70,10)) +
+  scale_color_brewer(name = "Diversity", palette = "Dark2",
+                     labels = divlabels) +
+  theme_bw()
 ```
 
 Why does the beta diversity increase when the alpha and gamma diversities both decrease?
@@ -114,13 +157,17 @@ For our next plot, let's revisit the data set and determine the number of new de
 Filter based on these species and the new record flag.
 
 ```{r}
-
+sub_obs <- bird_obs2 %>%
+  filter(SPECIES %in% c("EVGR", "NSOW", "PAWR", "STJA", "PISI", "RECR"),
+         NEW_RECORD == 1)
 ```
 
 Now determine how many new detections of these species occurred per year, plot, and replicate. We can assume that these new detections represent unique individuals per survey.
 
 ```{r}
-
+sub_counts <- sub_obs %>%
+  group_by(YEAR, PLOT, REPLICATE, SPECIES, COMMONNAME) %>%
+  summarize(DETECTIONS = sum(NEW_RECORD))
 ```
 
 Next create a figure showing how many times each species was detected across all plots and replicates. Generate six panels with the following:
@@ -130,7 +177,15 @@ Next create a figure showing how many times each species was detected across all
 - columns: Species
 
 ```{r}
-
+ggplot(data = sub_counts,
+       aes(x = YEAR, y = DETECTIONS)) +
+  stat_summary(fun = "sum", geom = "line") +
+  scale_x_continuous(name = "Year",
+                     breaks = seq(2009, 2023, 2)) +
+  scale_y_continuous(name = "Total detections (individuals)") +
+  facet_wrap(~COMMONNAME, scales = "free_y", ncol = 2) +
+  theme_bw() +
+  theme(legend.position = "top")
 ```
 
 What could have occurred in 2015 and 2020 that affected common, rare, and irruptive species?
@@ -140,7 +195,10 @@ YOUR ANSWER HERE
 Finally, plot a histogram of the detections of your favorite species. What distribution would you use to model the number of birds detected?
 
 ```{r}
-
+hist(filter(sub_counts, SPECIES == "PISI")$DETECTIONS,
+     main = "Histogram of Detections",
+     xlab = "Number of birds detected per survey",
+     breaks = 20)
 ```
 
 YOUR ANSWER HERE
