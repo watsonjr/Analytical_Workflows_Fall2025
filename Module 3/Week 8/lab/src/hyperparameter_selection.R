@@ -14,12 +14,12 @@ args = commandArgs(trailingOnly=TRUE)
 species <- args[1]
 
 # libraries 
-library(parallel)
-library(randomForest)
-library(dplyr)
-library(purrr)
-library(ggplot2)
-library(reshape2)
+require(parallel)
+require(randomForest)
+require(dplyr)
+require(purrr)
+require(ggplot2)
+require(reshape2)
 
 # load useful functions from performance_metrics.R
 
@@ -89,9 +89,9 @@ testing <-
 param_levels <- # set hyper parameter levels using a vector c(...)
 
 ### Set up virtual parallel processing to run cross validation tests in parallel
-nmax <- # detect number of cores on your machine use library(help = "parallel") to find the function for this
+nmax <- # detect number of cores on your machine use require(help = "parallel") to find the function for this
 nuse <- nmax-2 # use all but 2 cores for the analysis
-cl <- # make the virtual parallel computing cluster. again see library(help = "parallel") for helpful functions
+cl <- # make the virtual parallel computing cluster. again see require(help = "parallel") for helpful functions
 
 # export the functions, data and variables used in the analysis to cluster using parallel::clusterExport
 exp_data <- # list names of functions and varibles as strings.

@@ -16,12 +16,12 @@ ntree <-  as.numeric(args[2])
 
  
 # Load libraries
-library(dplyr)
-library(reshape2)
-library(ggplot2)
-library(randomForest)
-library(caret)
-library(doParallel)
+require(dplyr)
+require(reshape2)
+require(ggplot2)
+require(randomForest)
+require(caret)
+require(doParallel)
 
 # Load data (choose between presence or density)
 

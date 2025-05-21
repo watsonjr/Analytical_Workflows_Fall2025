@@ -7,11 +7,11 @@ args = commandArgs(trailingOnly=TRUE)
 species <- args[1]
 
 # Load libraries
-library(dplyr)
-library(reshape2)
-library(ggplot2)
-library(lubridate)
-library(PNWColors)
+require(dplyr)
+require(reshape2)
+require(ggplot2)
+require(lubridate)
+require(PNWColors)
 
 # Load data 
 data_presence <- read.csv(paste0("data/", species, "_presence.csv"))
