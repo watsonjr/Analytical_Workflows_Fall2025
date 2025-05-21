@@ -20,6 +20,10 @@ Learn to work with data analysis pipelines built with R scripts Run R programs f
 The rest of this file contains step-by-step instructions for how to run the R scripts and complete the lab. Some of the steps will only require you to run pre-prepared R scripts, while others will require you to complete missing code chunks in existing files.\
 Steps 7 and 9 both include numbered questions that you should be able to answer based on the analysis up to that point. Please write short-form answers to these questions (a few sentences or so) in a Word document or text file to include with your code.
 
+#### Step 0: Load packages
+
+Open up the file load_packages.R in the `src` directory and run the file from the console by clicking the run icon in the top right hand side of the text editor. If this does not work you can also run the file line by line by highlighting individual lines or groups of lines before hitting the run icon.  
+
 #### Step 1: Check out the structure of the directory
 
 Open up the Terminal window in R Studio or in a separate tab, open up the command line, and navigate to the ML_workflows_lab directory using the `cd` command. Typing `cd ~/absolute/path/to/directory` will take you there. For example, I saved the lab in my documents folder, so I typed `cd ~/Documents/ML_workflows_lab`. Check that you successfully navigated to the directory by typing `pwd`; this will tell you your current working directory.
