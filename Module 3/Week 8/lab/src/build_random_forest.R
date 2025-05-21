@@ -13,10 +13,10 @@ mtry <- as.numeric(args[3])
 
 
 # Load libraries
-library(dplyr)
-library(reshape2)
-library(ggplot2)
-library(randomForest)
+require(dplyr)
+require(reshape2)
+require(ggplot2)
+require(randomForest)
 
 # Load presence data for species
 

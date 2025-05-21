@@ -9,9 +9,9 @@ species <- args[1]
 data_type <- args[2]
 
 # libraries
-library(dplyr)
-library(ggplot2)
-library(randomForest)
+require(dplyr)
+require(ggplot2)
+require(randomForest)
 
 
 # Read in saved random forest model from the results/rf_models directory 

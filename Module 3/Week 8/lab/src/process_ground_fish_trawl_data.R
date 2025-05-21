@@ -5,13 +5,13 @@
 #################################################################
 
 args = commandArgs(trailingOnly=TRUE)
-species <- "arrowtooth flounder" #args[1]
+species <- args[1]
 
 # Load libraries
-library(dplyr)
-library(reshape2)
-library(ggplot2)
-library(lubridate)
+require(dplyr)
+require(reshape2)
+require(ggplot2)
+require(lubridate)
 
 # Load data 
 data_species <- read.csv("raw_data/CATCH AND HAUL DATA .csv")%>%

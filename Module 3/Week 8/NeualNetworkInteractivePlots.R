@@ -2,6 +2,8 @@
 ### How simple neural networks learn complex functions ### 
 ###########################################################
 install.packages("manipulate","ggplot2")
+yes
+
 library(manipulate)
 library(ggplot2)
 
@@ -15,6 +17,9 @@ manipulate(
   w1 = slider(-3, 3, step=0.01, initial = 1),
   b1 = slider(-3, 3, step=0.01, initial = 0.0)
 )
+
+
+
 
 
 # Plot a neural network with one input, three hidden units, and one output.  
@@ -94,49 +99,15 @@ manipulate(
 
 
 
-### More neurons can capture more complex functions  
-x_sample <- 8*(runif(length(x_))-0.5)
-e_sample <- 0.25*rnorm(length(x_))
-y_ <- 0.25*x_sample^2+e_sample
-neuron_1 <- function(x){nn(x,1.5,5.0)}
-neuron_2 <- function(x){nn(x,1.5,2.5)}
-neuron_3 <- function(x){nn(x,1.5,0.0)}
-neuron_4 <- function(x){nn(x,1.5,-2.5)}
-neuron_5 <- function(x){nn(x,1.5,-5.0)}
-nn_3 <- function(x,w1,w2,w3,w4,w5,b){
-  b+w1*neuron_1(x)+w2*neuron_2(x)+w3*neuron_3(x)+w4*neuron_4(x)+w5*neuron_5(x)
-}
-plt_function <- function(w1,w2,w3,w4,w5,b){
-  y_hat=c(nn_3(x_,w1,w2,w3,w4,w5,b),w1*neuron_1(x_),w2*neuron_2(x_),w3*neuron_3(x_),w4*neuron_4(x_),w5*neuron_5(x_))
-  groups = c(rep("Neural network", length(x_)), rep("Neuron 1", length(x_)),
-             rep("Neuron 2", length(x_)),rep("Neuron 3", length(x_)),
-             rep("Neuron 4", length(x_)),rep("Neuron 5", length(x_)))
-  dat <- data.frame(x=rep(x_,6),y=y_hat,group = groups )
-  MSE <- mean((nn_3(x_sample,w1,w2,w3,w4,w5,b) - y_)^2)
-  
-  ggplot(dat,aes(x=x,y,y, color = group, alpha= group))+
-    geom_line(linewidth = 1)+ ylim(-2,6)+theme_classic()+
-    scale_color_manual(values = c("grey","black", "purple", "blue","darkgreen" ,"green", "yellow"))+
-    scale_alpha_manual(values = c(0.75,1.0, 0.5, 0.5, 0.5,0.5,0.5))+
-    ylab("Neural network output")+xlab("Input (X)")+
-    geom_point(data=data.frame(x = x_sample, y = y_,color = "black", group = "data"))+
-    ggtitle(paste("Loss = ", MSE))
-}
-
-manipulate(
-  plt_function(w1,w2,w3,w4,w5,b),
-  w1 = slider(-2.5, 2.5, step=0.01, initial = 1),
-  w2 = slider(-2.5, 2.5, step=0.01, initial = 1.0),
-  w3 = slider(-2.5, 2.5, step=0.01, initial = 1),
-  w4 = slider(-2.5, 2.5, step=0.01, initial = 1),
-  w5 = slider(-2.5, 2.5, step=0.01, initial = 1),
-  b = slider(-6.0, 6.0, step=0.01, initial = 0.0)
-)
 
 
 
 
 
+
+###################
+### Extra plots ###
+###################
 
 # Plot a neural network with one input, three hidden units, and one output.  
 # This plot allows the weights and biases of the final output neuron to be adjusted.
@@ -204,4 +175,46 @@ manipulate(
   b = slider(-1.5, 1.5, step=0.01, initial = 0.0)
 )
 
+
+
+
+
+### More neurons can capture more complex functions  
+x_sample <- 8*(runif(length(x_))-0.5)
+e_sample <- 0.25*rnorm(length(x_))
+y_ <- 0.25*x_sample^2+e_sample
+neuron_1 <- function(x){nn(x,1.5,5.0)}
+neuron_2 <- function(x){nn(x,1.5,2.5)}
+neuron_3 <- function(x){nn(x,1.5,0.0)}
+neuron_4 <- function(x){nn(x,1.5,-2.5)}
+neuron_5 <- function(x){nn(x,1.5,-5.0)}
+nn_3 <- function(x,w1,w2,w3,w4,w5,b){
+  b+w1*neuron_1(x)+w2*neuron_2(x)+w3*neuron_3(x)+w4*neuron_4(x)+w5*neuron_5(x)
+}
+plt_function <- function(w1,w2,w3,w4,w5,b){
+  y_hat=c(nn_3(x_,w1,w2,w3,w4,w5,b),w1*neuron_1(x_),w2*neuron_2(x_),w3*neuron_3(x_),w4*neuron_4(x_),w5*neuron_5(x_))
+  groups = c(rep("Neural network", length(x_)), rep("Neuron 1", length(x_)),
+             rep("Neuron 2", length(x_)),rep("Neuron 3", length(x_)),
+             rep("Neuron 4", length(x_)),rep("Neuron 5", length(x_)))
+  dat <- data.frame(x=rep(x_,6),y=y_hat,group = groups )
+  MSE <- mean((nn_3(x_sample,w1,w2,w3,w4,w5,b) - y_)^2)
+  
+  ggplot(dat,aes(x=x,y,y, color = group, alpha= group))+
+    geom_line(linewidth = 1)+ ylim(-2,6)+theme_classic()+
+    scale_color_manual(values = c("grey","black", "purple", "blue","darkgreen" ,"green", "yellow"))+
+    scale_alpha_manual(values = c(0.75,1.0, 0.5, 0.5, 0.5,0.5,0.5))+
+    ylab("Neural network output")+xlab("Input (X)")+
+    geom_point(data=data.frame(x = x_sample, y = y_,color = "black", group = "data"))+
+    ggtitle(paste("Loss = ", MSE))
+}
+
+manipulate(
+  plt_function(w1,w2,w3,w4,w5,b),
+  w1 = slider(-2.5, 2.5, step=0.01, initial = 1),
+  w2 = slider(-2.5, 2.5, step=0.01, initial = 1.0),
+  w3 = slider(-2.5, 2.5, step=0.01, initial = 1),
+  w4 = slider(-2.5, 2.5, step=0.01, initial = 1),
+  w5 = slider(-2.5, 2.5, step=0.01, initial = 1),
+  b = slider(-6.0, 6.0, step=0.01, initial = 0.0)
+)
 

@@ -8,11 +8,11 @@ species <- args[1]
 variable <- args[2]
 
 # load pdp package for partial dependence plots, and ggplot + ggplotify for saving
-library(pdp)
-library(randomForest)
-library(ggplot2)
-library(ggplotify) 
-library(dplyr)
+require(pdp)
+require(randomForest)
+require(ggplot2)
+require(ggplotify) 
+require(dplyr)
 
 # Read in saved random forest model using paste0 to include the species name
 
