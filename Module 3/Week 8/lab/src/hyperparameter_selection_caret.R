@@ -1,15 +1,16 @@
 ######################################################
-### Run cross validation test leaving full years   ###
+### Run cross-validation test leaving full years   ###
 ### of data out fo the presence absence data set.  ###
 ###                                                ###
-### Compute cross validation metric for suite of   ###
-### models with different hyper-parameters, by     ###
+### Compute cross-validation metric for a suite of ###
+### models with different hyperparameters, by      ###
 ### leaving individual years out of the data set.  ###
-### The best model is then then test on the        ###
+### The best model is then tested on the           ###
 ### final 2 years of data.                         ###
 ######################################################
 
-# read in comand line arguments
+
+# Read in command line arguments
 args = commandArgs(trailingOnly=TRUE)
 species <- args[1] 
 ntree <-  as.numeric(args[2]) 
@@ -25,29 +26,30 @@ require(doParallel)
 
 # Load data (choose between presence or density)
 
-# Final data processing for rf model 
-# remove Haul.ID, Survey year, lat, lon and X
-# filter rows with NANs out of the data set
+
+# Final data processing for random forest model 
+# remove Haul.ID, Survey yea,r, lat, lon and X
+# filter rows with NANs out of the dataset
 data_presence <- 
 
-# set values of the mtry hyper parameter to test in the 
+# Set values of the mtry hyperparameter to test 
 tunegrid <- expand.grid(
     mtry = c(1,2,3,4,5,6,7,8,9)
 )
 
 # Set up the parameters of the caret tuning process with `trainControl`
-# caret training method to cross validation ("cv")
-# and the number of folds k.
-# this function will automatically create randomly selected training and testing sets. 
+# caret training method to cross-validation ("cv") and the number of folds k.
+# This function will automatically create randomly selected training and testing sets. 
 
 
-# Use the caret `train` function to a random forest model on the data
-# comparing the performance of each value of mtry in tunegrid 
+
+# Use the caret `train` function to train a random forest model on the data
+# Comparing the performance of each value of mtry in tunegrid 
 rf_model_rand <- 
 
 
-# The following block of code will create a list of index for different training 
-# and testing sets by breaking the data set up into block of consecutive years. 
+# The following block of code will create a list of indices for different training 
+# and testing sets by breaking the dataset up into blocks of consecutive years. 
 # Repeat the prior analysis using these blocks as the training and validation sets.
 k <- 12
 index <- list()

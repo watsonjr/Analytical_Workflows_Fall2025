@@ -1,7 +1,6 @@
 #################################################################
-### Explore the structure of the NOAA BSAI trawl survey data. ###
-### Make plots to visualize basic patters.                    ###
-### Example data pipeline for snow crab                       ###
+### Build a random forest model for the presence and abundance ##
+### of a species in the NOAA Bering Sea trawl data set.       ###
 #################################################################
 
 # load command line arguments 
@@ -20,17 +19,18 @@ require(randomForest)
 
 # Load presence data for species
 
-# Final data processing for rf model 
-# remove Haul.ID, Survey year, lat, lon and X
-# filter rows with NANs out of the data set
+# Final data processing for random forest model 
+# remove Haul.ID, Survey year, lat, lon, and X
+# filter rows with NANs out of the dataset
 data_presence <- 
 
 # Train model on presence data 
-# train a random forest for the presence data using all colums as covariates
+# Train a random forest for the presence data using all columns as covariates
 # Build ntree trees and try mtry variables at each split. 
+  
 rf <- randomForest(...)
 
-# Save rf data model and related data to the resutls/rf_models file
+# Save rf model and related data to the resutls/rf_models file
 write.csv(rf$confusion,paste0("results/rf_models/rf_confusion_",species,"_presence.csv") )
 saveRDS(rf, file = paste0("results/rf_models/rf_model_",species,"_presence.rdata"))
 saveRDS(data_presence, file = paste0("results/rf_models/rf_data_",species,"_presence.rdata"))
@@ -39,7 +39,7 @@ saveRDS(data_presence, file = paste0("results/rf_models/rf_data_",species,"_pres
 ####### Repeat for densities data ########
 ##########################################
 
-# save rf data 
+# Save random foret model for densities data 
 model_performacne <- data.frame(mse = rf$mse[ntree], rsq = rf$rsq[ntree])
 write.csv(model_performacne,paste0("results/rf_models/rf_performance_",species,"_density.csv") )
 saveRDS(rf, file = paste0("results/rf_models/rf_model_",species,"_density.rdata"))

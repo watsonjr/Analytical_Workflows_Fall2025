@@ -1,11 +1,11 @@
 ######################################################
-### Run cross validation test leaving full years   ###
-### of data out fo the presence absence data set.  ###
+### Run cross-validation test leaving full years   ###
+### of data out of the presence dataset.           ###
 ###                                                ###
-### Compute cross validation metric for suite of   ###
-### models with different hyper-parameters, by     ###
+### Compute cross-validation metric for several    ###
+### models with different hyperparameters, by      ###
 ### leaving individual years out of the data set.  ###
-### The best model is then then test on the        ###
+### The best model is then tested on the           ###
 ### final 2 years of data.                         ###
 ######################################################
 
@@ -30,15 +30,15 @@ source("src/performance_metrics.R")
 ########################
 
 
-# This function trains the random forest model on the data set 
+# This function trains the random forest model on the dataset 
 # training while setting the *choose a hyper-parameter* to h_param
-# use help(randomForest) to see how the models hyper parameters can be modified
+# use help(randomForest) to see how the model's hyperparameters can be modified
 train_presence_rf <- function(training, h_param){
   return(rf)
 }
 
 
-# Train the random forest model leaving year i out of the training data set
+# Train the random forest model, leaving year i out of the training dataset
 # set the hyperparameter value to h_param
 test_model_i <- function(i,h_param,training){
   sub_training_data <- # leave year i out ot the training data set
@@ -49,15 +49,17 @@ test_model_i <- function(i,h_param,training){
 } 
 
 
-# set up method to calculate 
+# set up method to calculate teh out of sample performance of the model
+# given the value of the hyper parameters h_param
 test_hyper_param <- function(h_param,training,cl){
   
   # run model tests set 1:k using parLapply
   output_list <- # use parLapply to run the test_model_i on each year in the training data set
   # type help(parLapply) to learn about the parLapply
-  # hint: you will need to create a list of years including the the training data set the unique() function can help
-  # you will also need to create a function to pass to parLapply that runs test_model_i
-  # on the training data set and h_param but only requires the year i and an argument.
+  # hint: you will need to create a list of years, including the training data set, the unique() function can help
+  # You will also need to create a function to pass to parLapply that runs test_model_i
+  # on the training data set and h_param, but only requires the year i and an argument.
+    
   
   c_mat <- reduce(output_list,element_sum)
   
@@ -77,16 +79,16 @@ test_hyper_param <- function(h_param,training,cl){
 
 # load data set 
 
-# Final data processing for rf model 
-# remove Haul.ID, Survey year, lat, lon and X
-# filter rows with NANs out of the data set
+# Final data processing for random forest model 
+# remove Haul.ID, Survey year, lat, lon, and X
+# filter rows with NANs out of the dataset
 data_presence <- 
   
 # split data into training and final testing set
 training <- 
 testing <- 
 
-param_levels <- # set hyper parameter levels using a vector c(...)
+param_levels <- # set hyperparameter levels using a vector c(...)
 
 ### Set up virtual parallel processing to run cross validation tests in parallel
 nmax <- # detect number of cores on your machine use require(help = "parallel") to find the function for this
@@ -94,35 +96,35 @@ nuse <- nmax-2 # use all but 2 cores for the analysis
 cl <- # make the virtual parallel computing cluster. again see require(help = "parallel") for helpful functions
 
 # export the functions, data and variables used in the analysis to cluster using parallel::clusterExport
-exp_data <- # list names of functions and varibles as strings.
+exp_data <- # list names of functions and variables needed in the analysis as strings.
 clusterExport(cl, exp_data, envir=environment())
 
 # Loop over the values of each hyperparameter in series 
 # and save the performance metric to a data frame named df_metrics
 
-# close cluster when task completes
+# close the cluster when the task completes
 stopCluster(cl) 
 
-# plot cross validation metrics as a function of the hyper parameter value
-# and save to the `results/parameter_selection` file
+# Plot cross-validation metrics as a function of the hyperparameter value
+# and save to the `results/parameter_selection` file.
 
 
-# save cross validation metrics 
+# Save cross-validation metrics 
 write.csv(df_metrics,paste0("results/parameter_selection/mtry_",species,"_presence.csv"))
 
 
 ##########################################################
 ## select best model based on cross validation results ###
-## and test in its performacne on the testing data set ###
+## and test its performance on the testing data set    ###
 ##########################################################
 
-# select the best value fo the hyper parameter
+# Select the best value of the hyperparameter
 ind <- df_metrics$error_rate == max(df_metrics$error_rate)
 best_mtry <- df_metrics$hyper_param[ind] 
 
 
 # test the selected model on the training data set
-rf <- # build rf model on the compete data set. You can use the train_presence_rf function you already defined for this 
+rf <- # build rf model on the complete data set. You can use the train_presence_rf  
 c_mat <-  # Calculate confusion matrix on testing data set using the confusion function from performance_metrics.R
 
 # calculate final suite of performance metrics using function from performance_metrics.R

@@ -1,7 +1,6 @@
 #################################################################
 ### Explore the structure of the NOAA BSAI trawl survey data. ###
-### Make plots to visualize basic patters.                    ###
-### Example data pipeline for snow crab                       ###
+### Make plots to visualize basic patterns.                    ###
 #################################################################
 args = commandArgs(trailingOnly=TRUE)
 species <- args[1]
